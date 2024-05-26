@@ -1,0 +1,57 @@
+Table User {
+  id int [pk]
+}
+
+Table Profile {
+  id int [pk]
+  user_id int [ref: > User.id]
+  name varchar
+  phone varchar
+  address varchar
+}
+
+Table Booking {
+  id int [pk]
+  profile_id int [ref: > Profile.id]
+  room_id int [ref: > Room.id]
+  date date
+  check_in_date date
+  check_out_date date
+  status varchar
+}
+
+Table Room {
+  id int [pk]
+  room_number varchar
+  room_type varchar
+  price_per_night decimal
+}
+
+Table Payment {
+  id int [pk]
+  booking_id int [ref: > Booking.id]
+  method_id int [ref: > PaymentMethod.id]
+  date date
+  amount_paid decimal
+  status varchar
+}
+
+Table PaymentMethod {
+  id int [pk]
+  name varchar
+  description text
+}
+
+Table PaymentMethodAttribute {
+  id int [pk]
+  method_id int [ref: > PaymentMethod.id]
+  name varchar
+  type text
+}
+
+Table ProfilePaymentAttribute {
+  id int [pk]
+  profile_id int [ref: > Profile.id]
+  attribute_id int [ref: > PaymentMethodAttribute.id]
+  value varchar
+}
