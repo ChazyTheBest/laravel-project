@@ -31,21 +31,4 @@ class Profile extends Model
     {
         return $this->hasMany(Booking::class);
     }
-
-    /**
-     * Get the payment attributes for the profile.
-     */
-    public function paymentAttributes()
-    {
-        return $this->hasMany(ProfilePaymentAttributes::class);
-    }
-
-    /**
-     * Get the payment methods for the profile.
-     */
-    public function paymentMethods()
-    {
-        return $this->paymentAttributes()->with('name.paymentMethod')
-                                         ->groupBy('name.paymentMethod.name');
-    }
 }

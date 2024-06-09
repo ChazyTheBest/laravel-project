@@ -17,6 +17,18 @@ class Booking extends Model
     protected $table = 'booking';
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => BookingStatus::class,
+        ];
+    }
+
+    /**
      * Get the profile that owns the booking.
      */
     public function profile()
@@ -33,9 +45,9 @@ class Booking extends Model
     }
 
     /**
-     * Get the payments for the booking.
+     * Get the payment for the booking.
      */
-    public function payments()
+    public function payment()
     {
         return $this->hasMany(Payment::class);
     }

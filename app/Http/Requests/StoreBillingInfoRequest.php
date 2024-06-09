@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProfileRequest extends FormRequest
+class StoreBillingInfoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,26 +22,12 @@ class StoreProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'phone_2' => 'string|max:20',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'postal_code' => 'required|string|max:20',
             'country' => 'required|string|max:255',
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        $components = $this->input('components', []);
-        if (!empty($components)) {
-            $snapshot = json_decode($components[0]['snapshot'] ?? '{}', true);
-            $data = $snapshot['data'] ?? [];
-
-            $this->merge($data);
-        }
     }
 
     /**
@@ -52,14 +38,6 @@ class StoreProfileRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'The name field is required.',
-            'name.string' => 'The name must be a string.',
-            'name.max' => 'The name may not be greater than 255 characters.',
-            'phone.required' => 'The phone number field is required.',
-            'phone.string' => 'The phone number must be a string.',
-            'phone.max' => 'The phone number may not be greater than 20 characters.',
-            'phone_2.string' => 'The optional phone number must be a string.',
-            'phone_2.max' => 'The optional phone number may not be greater than 20 characters.',
             'address.required' => 'The address field is required.',
             'address.string' => 'The address must be a string.',
             'address.max' => 'The address may not be greater than 255 characters.',

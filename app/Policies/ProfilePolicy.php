@@ -21,7 +21,9 @@ class ProfilePolicy
      */
     public function view(User $user, Profile $profile): bool
     {
-        return $user->role === 'staff' || $user->id === $profile->user_id;
+        return $user->hasRole('staff') || $user->id === $profile->user_id
+                    ? Response::allow()
+                    : Response::deny('You do not own the selected profile.');
     }
 
     /**
@@ -37,7 +39,9 @@ class ProfilePolicy
      */
     public function update(User $user, Profile $profile): bool
     {
-        return $user->role === 'staff' || $user->id === $profile->user_id;
+        return $user->hasRole('staff') || $user->id === $profile->user_id
+                    ? Response::allow()
+                    : Response::deny('You do not own the selected profile.');
     }
 
     /**
@@ -45,7 +49,9 @@ class ProfilePolicy
      */
     public function delete(User $user, Profile $profile): bool
     {
-        return $user->role === 'staff' || $user->id === $profile->user_id;
+        return $user->hasRole('staff') || $user->id === $profile->user_id
+                    ? Response::allow()
+                    : Response::deny('You do not own the selected profile.');
     }
 
     /**
@@ -53,7 +59,9 @@ class ProfilePolicy
      */
     public function restore(User $user, Profile $profile): bool
     {
-        return $user->role === 'staff' || $user->id === $profile->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -61,6 +69,8 @@ class ProfilePolicy
      */
     public function forceDelete(User $user, Profile $profile): bool
     {
-        return $user->role === 'staff' || $user->id === $profile->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 }

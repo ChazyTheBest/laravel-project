@@ -17,6 +17,19 @@ class Payment extends Model
     protected $table = 'payment';
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => PaymentStatus::class,
+            'response_data' => 'array',
+        ];
+    }
+
+    /**
      * Get the booking that owns the payment.
      */
     public function booking()
@@ -25,10 +38,29 @@ class Payment extends Model
     }
 
     /**
-     * Get the payment method.
+     * Get the payment status.
      */
-    public function method()
+    public function status()
     {
-        return $this->belongsTo(PaymentMethod::class);
+        return $this->hasOne(PaymentStatus::class);
+    }
+
+    /**
+     * Get the payment billing information.
+     */
+    public function billingInfo()
+    {
+        return $this->hasOne(BillingInfo::class);
+    }
+
+    /**
+     * Store or append response data.
+     */
+    public function handleResponseData(array $response)
+    {
+        $responses = $this->payment_responses ?? [];
+        $responses[] = $response;
+        $this->payment_responses = $responses;
+        //$this->save();
     }
 }

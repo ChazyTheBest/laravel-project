@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\Role;
 
 class User extends Authenticatable// implements MustVerifyEmail
 {
@@ -69,14 +70,39 @@ class User extends Authenticatable// implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => Role::class,
         ];
     }
 
     /**
-     * Get the profiles for the user.
+     * Get the profiles associated with the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function profiles()
     {
         return $this->hasMany(Profile::class);
+    }
+
+    /**
+     * Check if the user owns a profile with the given profile ID.
+     *
+     * @param mixed $profileId The ID of the profile.
+     * @return bool True if the user owns the profile, false otherwise.
+     */
+    public function ownsProfile($profileId)
+    {
+        return $this->profiles()->where('id', $profileId)->exists();
+    }
+
+    /**
+     * Check if the user has a specific role.
+     *
+     * @param Role $role The role to check.
+     * @return bool
+     */
+    public function hasRole(Role $role): bool
+    {
+        return $this->role === $role;
     }
 }

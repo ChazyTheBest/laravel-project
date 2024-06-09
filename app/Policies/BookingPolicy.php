@@ -21,7 +21,9 @@ class BookingPolicy
      */
     public function view(User $user, Booking $booking): bool
     {
-        return $user->role === 'staff' || $user->id === $booking->user_id;
+        return $user->hasRole('staff') || $user->id === $booking->profile->user_id
+                    ? Response::allow()
+                    : Response::deny('You do not own the selected booking.');
     }
 
     /**
@@ -37,7 +39,9 @@ class BookingPolicy
      */
     public function update(User $user, Booking $booking): bool
     {
-        return $user->role === 'staff' || $user->id === $booking->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -45,7 +49,9 @@ class BookingPolicy
      */
     public function delete(User $user, Booking $booking): bool
     {
-        return $user->role === 'staff' || $user->id === $booking->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -53,7 +59,9 @@ class BookingPolicy
      */
     public function restore(User $user, Booking $booking): bool
     {
-        return $user->role === 'staff' || $user->id === $booking->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -61,6 +69,8 @@ class BookingPolicy
      */
     public function forceDelete(User $user, Booking $booking): bool
     {
-        return $user->role === 'staff' || $user->id === $booking->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 }

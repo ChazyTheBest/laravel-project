@@ -13,7 +13,9 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -21,7 +23,9 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
-        return $user->role === 'staff' || $user->id === $payment->user_id;
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -37,7 +41,9 @@ class PaymentPolicy
      */
     public function update(User $user, Payment $payment): bool
     {
-        return $user->role === 'staff';
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -45,7 +51,9 @@ class PaymentPolicy
      */
     public function delete(User $user, Payment $payment): bool
     {
-        return $user->role === 'staff';
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -53,7 +61,9 @@ class PaymentPolicy
      */
     public function restore(User $user, Payment $payment): bool
     {
-        return $user->role === 'staff';
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 
     /**
@@ -61,6 +71,8 @@ class PaymentPolicy
      */
     public function forceDelete(User $user, Payment $payment): bool
     {
-        return $user->role === 'staff';
+        return $user->hasRole('staff')
+                    ? Response::allow()
+                    : Response::deny('You are not authorized to perform this action.');
     }
 }

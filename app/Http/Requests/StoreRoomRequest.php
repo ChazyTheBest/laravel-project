@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Requests;
 
@@ -11,7 +11,17 @@ class StoreRoomRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::user()->hasRole('staff');
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function failedAuthorization()
+    {
+        throw new AuthorizationException('You are not authorized to perform this action.');
     }
 
     /**
@@ -22,7 +32,40 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'number' => 'required|numeric|unique:rooms,number',
+            'capacity' => 'required|integer|min:1',
+            'beds' => 'required|integer|min:1',
+            'name' => 'required|string|unique:rooms,name',
+            'description' => 'required|string',
+            'price_per_night' => 'required|numeric|min:0',
+        ];
+    }
+
+    /**
+     * Custom validation messages.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'number.required' => 'The room number is required.',
+            'number.numeric' => 'The room number must be a number.',
+            'number.unique' => 'The room number has already been taken.',
+            'capacity.required' => 'The room capacity is required.',
+            'capacity.integer' => 'The room capacity must be an integer.',
+            'capacity.min' => 'The room capacity must be at least :min.',
+            'beds.required' => 'The number of beds is required.',
+            'beds.integer' => 'The number of beds must be an integer.',
+            'beds.min' => 'The number of beds must be at least :min.',
+            'name.required' => 'The room name is required.',
+            'name.string' => 'The room name must be a string.',
+            'name.unique' => 'The room name has already been taken.',
+            'description.required' => 'The room description is required.',
+            'description.string' => 'The room description must be a string.',
+            'price_per_night.required' => 'The price per night is required.',
+            'price_per_night.numeric' => 'The price per night must be a number.',
+            'price_per_night.min' => 'The price per night must be at least :min.',
         ];
     }
 }
