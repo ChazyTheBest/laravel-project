@@ -17,6 +17,22 @@ class Profile extends Model
     protected $table = 'profile';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'phone',
+        'phone_2',
+        'address',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+    ];
+
+    /**
      * Get the user that owns the profile.
      */
     public function user()

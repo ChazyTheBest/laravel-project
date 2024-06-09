@@ -33,17 +33,6 @@ class StoreProfileRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation()
-    {
-        $components = $this->input('components', []);
-        if (!empty($components)) {
-            $snapshot = json_decode($components[0]['snapshot'] ?? '{}', true);
-            $data = $snapshot['data'] ?? [];
-
-            $this->merge($data);
-        }
-    }
-
     /**
      * Custom validation messages.
      *

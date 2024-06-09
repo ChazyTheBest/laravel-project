@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -79,7 +80,7 @@ class User extends Authenticatable// implements MustVerifyEmail
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function profiles()
+    public function profiles(): HasMany
     {
         return $this->hasMany(Profile::class);
     }
@@ -90,7 +91,7 @@ class User extends Authenticatable// implements MustVerifyEmail
      * @param mixed $profileId The ID of the profile.
      * @return bool True if the user owns the profile, false otherwise.
      */
-    public function ownsProfile($profileId)
+    public function ownsProfile($profileId): bool
     {
         return $this->profiles()->where('id', $profileId)->exists();
     }
@@ -98,7 +99,7 @@ class User extends Authenticatable// implements MustVerifyEmail
     /**
      * Check if the user has a specific role.
      *
-     * @param Role $role The role to check.
+     * @param App\Enums\Role $role The role to check.
      * @return bool
      */
     public function hasRole(Role $role): bool

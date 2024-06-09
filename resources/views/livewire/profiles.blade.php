@@ -16,9 +16,11 @@
                 <x-slot name="header">
                     <x-table.header>No.</x-table.header>
                     <x-table.header sortable wire:click.prevent="sortBy('name')"
-                        :direction="$sortField === 'name' ? $sortDirection : null">Name</x-table.header>
+                        :direction="$sortField === 'name' ? $sortDirection : null">{{ __('Name') }}</x-table.header>
                     <x-table.header sortable wire:click.prevent="sortBy('phone')"
-                        :direction="$sortField === 'phone' ? $sortDirection : null">Phone</x-table.header>
+                        :direction="$sortField === 'phone' ? $sortDirection : null">{{ __('Phone') }}</x-table.header>
+                    <x-table.header sortable wire:click.prevent="sortBy('address')"
+                        :direction="$sortField === 'address' ? $sortDirection : null">{{ __('Address') }}</x-table.header>
                     <x-table.header>Action</x-table.header>
                 </x-slot>
                 <x-slot name="body">
@@ -27,14 +29,15 @@
                     @endphp
                     @forelse ($profiles as $key => $profile)
                         <x-table.row>
-                            <x-table.cell> {{ $profile->id }}</x-table.cell>
+                            <x-table.cell>{{ $profile->id }}</x-table.cell>
                             <x-table.cell>{{ $profile->name }}</x-table.cell>
-                            <x-table.cell> {{ $profile->phone }}</x-table.cell>
+                            <x-table.cell>{{ $profile->phone }}</x-table.cell>
+                            <x-table.cell>{{ $profile->address }}</x-table.cell>
                             <x-table.cell>
                                 <button wire:click="openProfileEdit('{{ $profile->id }}')"
-                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ __('Edit') }}</button>
                                 <button wire:click="openProfileDelete('{{ $profile->id }}')"
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
+                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">{{ __('Delete') }}</button>
                             </x-table.cell>
                         </x-table.row>
                     @empty
@@ -87,11 +90,11 @@
     <!-- Delete Confirmation Modal -->
     <x-confirmation-modal wire:model.live="isProfileDeleteOpen">
         <x-slot name="title">
-            {{ __('Delete Record') }}
+            {{ __('Delete Profile') }}
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Are you sure you would like to delete this record?') }}
+            {{ __('Are you sure you would like to delete this profile?') }}
         </x-slot>
 
         <x-slot name="footer">

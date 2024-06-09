@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Role {
-    case USER;
-    case STAFF;
+enum Role: int {
+    case USER = 0;
+    case STAFF = 1;
 }
