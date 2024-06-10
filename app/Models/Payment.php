@@ -17,6 +17,15 @@ class Payment extends Model
     protected $table = 'payment';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'booking_id',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -61,6 +70,5 @@ class Payment extends Model
         $responses = $this->payment_responses ?? [];
         $responses[] = $response;
         $this->payment_responses = $responses;
-        //$this->save();
     }
 }

@@ -17,6 +17,18 @@ class Booking extends Model
     protected $table = 'booking';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'profile_id',
+        'room_id',
+        'check_in_date',
+        'check_out_date',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

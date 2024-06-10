@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg p-8">
                 <div class="w-full rounded-lg text-center text-sm font-bold leading-6 text-white">
-                    <form id="roomForm" action="{{ route('booking.create', ['room' => $room->id]) }}" method="POST" class="rounded-lg dark:bg-indigo-900 bg-indigo-300 p-4 shadow-lg">
+                    <form id="roomForm" action="{{ route('booking.info', ['room' => $room->id]) }}" method="POST" class="rounded-lg dark:bg-indigo-900 bg-indigo-300 p-4 shadow-lg">
                         @csrf
                         <span class="font-semibold text-gray-600 dark:text-gray-500">{{ $room->number }}</span>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ $room->name }}</h3>

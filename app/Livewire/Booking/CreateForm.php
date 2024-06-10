@@ -1,25 +1,26 @@
 <?php declare(strict_types=1);
 
-namespace App\Livewire;
+namespace App\Livewire\Booking;
 
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\StoreBillingInfoRequest;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
-class BookingComponent extends Component
+class CreateForm extends Component
 {
     public Room $room;
-    public object $profiles;
     public User $user;
+    public object $profiles;
 
     // Booking required data
     public int $profile_id;
     public int $room_id;
-    public string $checkInDate;
-    public string $checkOutDate;
+    public string $check_in_date;
+    public string $check_out_date;
 
     // The payment method to be used
     public int $payment_method;
@@ -47,19 +48,21 @@ class BookingComponent extends Component
             $this->country = $profile->country;
         }
 
-        $this->checkInDate = request()->input('check_in_date');
-        $this->checkOutDate = request()->input('check_out_date');
+        // hidden input elements for re-validation
+        $this->room_id = $room->id;
+        $this->check_in_date = request()->input('check_in_date');
+        $this->check_out_date = request()->input('check_out_date');
 
         return $this->render();
     }
 
     public function render()
     {
-        return view('livewire.booking', [
+        return view('booking.create-form', [
             'profiles' => $this->profiles,
             'room' => $this->room,
-            'checkInDate' => $this->checkInDate,
-            'checkOutDate' => $this->checkOutDate,
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date,
         ]);
     }
 
@@ -68,6 +71,7 @@ class BookingComponent extends Component
         return [
             ...(new StoreBookingRequest())->rules(),
             ...(new StoreBillingInfoRequest())->rules(),
+            'payment_method' => 'required|numeric|in:1,2' // todo abstract payment method names
         ];
     }
 
@@ -76,6 +80,9 @@ class BookingComponent extends Component
         return [
             ...(new StoreBookingRequest())->messages(),
             ...(new StoreBillingInfoRequest())->messages(),
+            'payment_method.required' => 'The payment method is required. Please select one.',
+            'payment_method.numeric' => 'Please select a valid payment method.',
+            'payment_method.in' => 'The selected payment method is invalid.',
         ];
     }
 
@@ -94,8 +101,8 @@ class BookingComponent extends Component
             // Step 1: Create booking
             $booking = $profile->bookings()->create([
                 'room_id' => $this->room->id,
-                'check_in_date' => $this->checkInDate,
-                'check_out_date' => $this->checkOutDate,
+                'check_in_date' => $this->check_in_date,
+                'check_out_date' => $this->check_out_date,
             ]);
 
             // Step 2: Create payment
@@ -111,7 +118,9 @@ class BookingComponent extends Component
                 'payment_id' => $payment->id,
             ]);
 
-            return redirect()->route('payment.mockup');
+            return redirect()->route('payment.mockup', [
+                'payment_id' => $payment->id
+            ]);
         });
     }
 }

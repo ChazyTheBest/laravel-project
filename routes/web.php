@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
@@ -50,11 +51,13 @@ Route::middleware('auth')->group(function () {
             'can:delete,user',              // Permission to delete a specific user
         ])*/;
 
-    Route::post('/booking/room/{room}', [BookingComponent::class, 'mount'])->name('booking.create');
+    Route::post('/booking/room/{room}', fn (Room $room) => view('booking.info', [
+        'room' => $room
+    ]))->name('booking.info');
 
     Route::get('/payment/mockup', [PaymentController::class, 'mockup'])
         ->name('payment.mockup');
 
-    Route::post('/payment/callback', [PaymentController::class, 'callback'])
+    Route::post('/payment/callback/{payment}', [PaymentController::class, 'callback'])
         ->name('payment.callback');
 });

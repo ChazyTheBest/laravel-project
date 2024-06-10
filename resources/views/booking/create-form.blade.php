@@ -1,19 +1,19 @@
 <x-form-section submit="book">
     <x-slot name="title">
-        {{ __('Booking Room') }}
+        {{ __('Booking :room_name', ['room_name' => $room->name]) }}
     </x-slot>
 
     <x-slot name="description">
         <span>{{ __('We just need a few details before we can book the room for you.') }}</span>
-        <span>Check-in Date: {{ $checkInDate }}</span>
-        <span>Check-out Date: {{ $checkOutDate }}</span>
+        <span>Check-in Date: {{ $check_in_date }}</span>
+        <span>Check-out Date: {{ $check_out_date }}</span>
         <span>Room Price per Night: {{ $room->price_per_night }}</span>
     </x-slot>
 
     <x-slot name="form">
-        <input type="hidden" wire:model="room_id" value="{{ $room->id }}">
-        <input type="hidden" wire:model="check_in_date" value="{{ $checkInDate }}">
-        <input type="hidden" wire:model="check_out_date" value="{{ $checkOutDate }}">
+        <x-input type="hidden" wire:model="room_id" />
+        <x-input type="hidden" wire:model="check_in_date" />
+        <x-input type="hidden" wire:model="check_out_date" />
 
         <div class="col-span-6 sm:col-span-4">
             <x-label for="profile" value="{{ __('Select Profile') }}:" />
@@ -22,14 +22,17 @@
 
         <div class="col-span-6 sm:col-span-4">
             <x-label value="{{ __('Select Payment Method') }}:"/></label>
-            <div class="col-span-6 sm:col-span-4">
-                <x-input id="credit_debit" type="radio" class="mt-1 block w-full" wire:model="payment_method" value="credit_debit" required />
-                <x-label for="credit_debit" value="{{ __('Credit/Debit Card') }}" />
+            <div class="mt-2">
+                <div class="flex items-center">
+                    <x-input id="credit_debit" type="radio" class="mt-1 mr-2" wire:model="payment_method" value="1" required />
+                    <x-label for="credit_debit" value="{{ __('Credit/Debit Card') }}" />
+                </div>
+                <div class="flex items-center mt-2">
+                    <x-input id="paypal" type="radio" class="mt-1 mr-2" wire:model="payment_method" value="2" required />
+                    <x-label for="paypal" value="{{ __('PayPal') }}" />
+                </div>
             </div>
-            <div class="col-span-6 sm:col-span-4">
-                <x-input id="paypal" type="radio" class="mt-1 block w-full" wire:model="payment_method" value="paypal" required />
-                <x-label for="paypal" value="{{ __('PayPal') }}" />
-            </div>
+            <x-input-error for="payment_method" class="mt-2" />
         </div>
 
         <x-label value="{{ __('Billing Information') }}:" class="col-span-6 sm:col-span-4" /></label>
@@ -71,7 +74,7 @@
     </x-slot>
 
     <x-slot name="actions">
-        <x-button wire:loading.attr="disabled" wire:submit.prevent>
+        <x-button>
             {{ __('Save') }}
         </x-button>
     </x-slot>

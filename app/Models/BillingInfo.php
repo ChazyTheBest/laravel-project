@@ -17,6 +17,19 @@ class BillingInfo extends Model
     protected $table = 'billing_info';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'address',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+    ];
+
+    /**
      * Get the payment that owns the billing information.
      */
     public function payment()
