@@ -17,6 +17,20 @@ class Room extends Model
     protected $table = 'room';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'number',
+        'capacity',
+        'beds',
+        'name',
+        'description',
+        'price_per_night',
+    ];
+
+    /**
      * Get the bookings for the room.
      */
     public function bookings()

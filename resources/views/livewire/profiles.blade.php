@@ -14,7 +14,9 @@
             </div>
             <x-table wire:loading.class="opacity-75">
                 <x-slot name="header">
-                    <x-table.header>No.</x-table.header>
+                    @if(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                            <x-table.header>ID</x-table.header>
+                    @endif
                     <x-table.header sortable wire:click.prevent="sortBy('name')"
                         :direction="$sortField === 'name' ? $sortDirection : null">{{ __('Name') }}</x-table.header>
                     <x-table.header sortable wire:click.prevent="sortBy('phone')"
@@ -24,12 +26,11 @@
                     <x-table.header>Action</x-table.header>
                 </x-slot>
                 <x-slot name="body">
-                    @php
-                        $i = (request()->input('page', 1) - 1) * $perPage;
-                    @endphp
                     @forelse ($profiles as $key => $profile)
                         <x-table.row>
-                            <x-table.cell>{{ $profile->id }}</x-table.cell>
+                            @if(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                                    <x-table.cell>{{ $profile->id }}</x-table.cell>
+                            @endif
                             <x-table.cell>{{ $profile->name }}</x-table.cell>
                             <x-table.cell>{{ $profile->phone }}</x-table.cell>
                             <x-table.cell>{{ $profile->address }}</x-table.cell>
@@ -42,7 +43,7 @@
                         </x-table.row>
                     @empty
                         <x-table.row>
-                            <x-table.cell colspan=4>
+                            <x-table.cell colspan=6>
                                 <div class="flex justify-center items-center">
                                     <span class="font-medium py-8 text-gray-400 text-xl">
                                         No data found...

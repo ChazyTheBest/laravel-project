@@ -50,12 +50,18 @@ class StoreBookingRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
+            'profile_id.required' => 'The profile ID field is required.',
             'profile_id.exists' => 'The selected profile does not exist.',
+            'room_id.required' => 'The room ID field is required.',
             'room_id.exists' => 'The selected room does not exist.',
-            'check_in_date.after_or_equal' => 'The check-in date must be a future date after today.',
+            'check_in_date.required' => 'The check-in date field is required.',
+            'check_in_date.date' => 'The check-in date must be a valid date.',
+            'check_in_date.after' => 'The check-in date must be a future date after today.',
+            'check_out_date.required' => 'The check-out date field is required.',
+            'check_out_date.date' => 'The check-out date must be a valid date.',
             'check_out_date.after' => 'The check-out date must be after the check-in date.',
         ];
     }

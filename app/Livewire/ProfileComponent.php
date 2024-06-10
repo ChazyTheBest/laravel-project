@@ -9,7 +9,6 @@ use App\Http\Requests\UpdateProfileRequest;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProfileComponent extends Component

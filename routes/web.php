@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
+use App\Livewire\BookingComponent;
 use App\Livewire\ProfileComponent;
 use App\Livewire\RoomComponent;
 use App\Livewire\UserComponent;
@@ -12,27 +11,13 @@ use App\Models\Profile;
 use App\Models\Room;
 use App\Models\User;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => view('dashboard'))->name('dashboard');
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-});
+Route::get('/room', [RoomController::class, 'index'])
+    ->name('room.index');
 
-Route::get('room', [RoomController::class, 'index'])
-    ->name('room.index')
-    ->middleware('can:viewAny,App\Models\Room');
-
-Route::get('room/{room}', [RoomController::class, 'show'])
-    ->name('room.show')
-    ->middleware('can:view,room');
+Route::get('/room/{room}', [RoomController::class, 'show'])
+    ->name('room.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profiles', ProfileComponent::class)
@@ -65,8 +50,10 @@ Route::middleware('auth')->group(function () {
             'can:delete,user',              // Permission to delete a specific user
         ])*/;
 
-    Route::get('booking/mockup', [BookingController::class, 'mockup'])
-        ->name('booking.mockup');
+    Route::post('/booking/room/{room}', [BookingComponent::class, 'mount'])->name('booking.create');
+
+    Route::get('/payment/mockup', [PaymentController::class, 'mockup'])
+        ->name('payment.mockup');
 
     Route::post('/payment/callback', [PaymentController::class, 'callback'])
         ->name('payment.callback');

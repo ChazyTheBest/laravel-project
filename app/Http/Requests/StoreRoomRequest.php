@@ -32,10 +32,10 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required|numeric|unique:rooms,number',
+            'number' => 'required|numeric|unique:room,number',
             'capacity' => 'required|integer|min:1',
             'beds' => 'required|integer|min:1',
-            'name' => 'required|string|unique:rooms,name',
+            'name' => 'required|string|unique:room,name',
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
         ];
