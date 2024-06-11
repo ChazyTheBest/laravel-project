@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Role;
 
 class UpdateBillingInfoRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateBillingInfoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->hasRole('staff');
+        return request()->user()->hasRole(Role::STAFF);
     }
 
     /**

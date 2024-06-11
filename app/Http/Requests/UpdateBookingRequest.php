@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Role;
 
 class UpdateBookingRequest extends FormRequest
 {
@@ -14,10 +15,10 @@ class UpdateBookingRequest extends FormRequest
         // Ensure profile_id is present in the request
         $this->validate(['profile_id' => 'required']);
 
-        $user = Auth::user();
+        $user = request()->user();
 
         // Check if the user is staff or owns the profile
-        return $user->hasRole('staff') || $user->ownsProfile($this->input('profile_id'));
+        return $user->hasRole(Role::STAFF) || $user->ownsProfile($this->input('profile_id'));
     }
 
     /**
@@ -37,8 +38,7 @@ class UpdateBookingRequest extends FormRequest
      */
     public function rules(): array
     {
-
-        return Auth::user()->hasRole('staff') ? [
+        return request()->user()->hasRole(Role::STAFF) ? [
             'profile_id' => 'required|exists:profile,id',
             'room_id' => 'required|exists:room,id',
             'check_in_date' => 'required|date|after:today',

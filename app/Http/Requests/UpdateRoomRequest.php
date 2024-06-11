@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\Role;
 
 class UpdateRoomRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdateRoomRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->hasRole('staff');
+        return request()->user()->hasRole(Role::STAFF);
     }
 
     /**
@@ -29,13 +31,21 @@ class UpdateRoomRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules($room_id = null): array
     {
         return [
-            'number' => 'required|numeric|unique:rooms,number',
+            'number' => [
+                'required',
+                'numeric',
+                Rule::unique('room', 'number')->ignore($room_id ?? $this->input('room_id')),
+            ],
             'capacity' => 'required|integer|min:1',
             'beds' => 'required|integer|min:1',
-            'name' => 'required|string|unique:rooms,name',
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('room', 'name')->ignore($room_id ?? $this->input('room_id')),
+            ],
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
         ];

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\PaymentStatus;
 
 class Payment extends Model
 {
@@ -67,8 +68,8 @@ class Payment extends Model
      */
     public function handleResponseData(array $response)
     {
-        $responses = $this->payment_responses ?? [];
+        $responses = $this->response_data ?? [];
         $responses[] = $response;
-        $this->payment_responses = $responses;
+        $this->response_data = $responses;
     }
 }

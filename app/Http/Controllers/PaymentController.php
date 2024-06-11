@@ -2,42 +2,86 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\BookingStatus;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use App\Enums\PaymentStatus;
+use App\Enums\BookingStatus;
 use App\Models\Payment;
 
 class PaymentController extends Controller
 {
-    public function mockup()
+    public function mockup(Payment $payment)
     {
-        return view('payment.mockup');
+        return view('payment.mockup', [
+            'payment' => $payment
+        ]);
     }
 
-    public function callback(Payment $payment)
+    public function callback(Request $request, Payment $payment)
     {
-        // read response json
-        $json_response = [];
+        // Check if the user owns the booking associated with the payment
+        $booking = $payment->booking()->with('profile.user')->first(); // Eager loading
+        if ($booking === null || $booking->profile->user->id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized user or booking not found'], 403);
+        }
 
-        // get the payment status from $json_response
-        // write logic to map different statusses and format to an int
-        // 0 pending, 1 success, 2 failed
-        $payment_status = 1;
-        // booking status is usually the same id order
-        // 0 pending, 1 confirmed, 2 payment failed, 3 cancelled
-        // so in this case a payment success means the booking is confirmed
-        $booking_status = 1;
+        // Read response JSON
+        $jsonResponse = $request->json()->all();
 
-        $payment->status = PaymentStatus::fromValue($payment_status);
-        $payment->handleResponseData($json_response); // appends it in case other transaction took place in the past
+        // TODO: implement vendor security validation checks with the provider key
+        // to make sure the requests are legitimate
+
+        // Check if the booking has alreday been paid for
+        if ($payment->status === PaymentStatus::SUCCESS) {
+            $payment->handleResponseData($jsonResponse); // Append additional data if needed
+            $payment->save();
+            return response()->json(['error' => 'This booking has already been paid for.'], 403);
+        }
+
+        // Get the payment status from $jsonResponse
+        $paymentStatusValue = $jsonResponse['payment_status'] ?? null;
+
+        // Map payment status string to int values
+        $paymentStatusValue = match ($paymentStatusValue) {
+            'success', '1' => 1,
+            'failed', '2' => 2,
+            default => null, // Handle other cases if needed
+        };
+
+        // Validate payment status
+        $paymentStatus = PaymentStatus::fromValue($paymentStatusValue);
+        if ($paymentStatus === null) {
+            $payment->status = PaymentStatus::FAILED;
+            $payment->handleResponseData($jsonResponse); // Append additional data if needed
+            $payment->save();
+            return response()->json(['error' => 'Invalid payment status value'], 400);
+        }
+
+        // Map payment status to booking status
+        $bookingStatus = match ($paymentStatus) {
+            PaymentStatus::SUCCESS => BookingStatus::CONFIRMED,
+            PaymentStatus::FAILED => BookingStatus::PAYMENT_FAILED,
+            default => BookingStatus::PENDING,
+        };
+
+        // Update payment status and set response_data
+        $payment->status = $paymentStatus;
+        $payment->handleResponseData($jsonResponse); // Append additional data if needed
         $payment->save();
 
-        $booking = $payment->booking();
-        $booking->status = BookingStatus::fromValue($booking_status);
+        // Update booking status
+        $booking->status = $bookingStatus;
         $booking->save();
 
-        // redirect user to booking success or fail
-        return $booking->status === BookingStatus::CONFIRMED
+        return response()->json(
+            $booking->status === BookingStatus::CONFIRMED
+                ? ['success' => 'Booking success']
+                : ['error' => 'Booking failed']
+        );
+
+        /*return $booking->status === BookingStatus::CONFIRMED
                     ? view('booking.confirmed')
-                    : view('booking.failed');
+                    : view('booking.failed');*/
     }
 }

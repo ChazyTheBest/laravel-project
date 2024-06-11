@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -13,9 +14,7 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -23,9 +22,7 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -41,9 +38,7 @@ class PaymentPolicy
      */
     public function update(User $user, Payment $payment): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -51,9 +46,7 @@ class PaymentPolicy
      */
     public function delete(User $user, Payment $payment): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -61,9 +54,7 @@ class PaymentPolicy
      */
     public function restore(User $user, Payment $payment): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -71,8 +62,6 @@ class PaymentPolicy
      */
     public function forceDelete(User $user, Payment $payment): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 }

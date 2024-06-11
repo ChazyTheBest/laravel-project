@@ -4,6 +4,7 @@ namespace App\Livewire\Booking;
 
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\StoreBillingInfoRequest;
+use App\Models\Profile;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -86,20 +87,31 @@ class CreateForm extends Component
         ];
     }
 
+    public function authorizeCreateBookingRequest(): bool
+    {
+        return (new StoreBookingRequest())->authorize($this->profile_id.'');
+    }
+
+    public function authorizeCreateBillingInfoRequest(): bool
+    {
+        return (new StoreBillingInfoRequest())->authorize();
+    }
+
     public function book()
     {
         $this->authorize('create', Booking::class);
         $this->authorize('create', Payment::class);
         $this->authorize('create', BillingInfo::class);
 
+        $this->authorizeCreateBookingRequest();
+        $this->authorizeCreateBillingInfoRequest();
+
         $this->validate();
 
-        $profile = $this->user->profiles()->findOrFail($this->profile_id);
-
         // Rollback on insert error
-        DB::transaction(function () use ($profile) {
+        DB::transaction(function () {
             // Step 1: Create booking
-            $booking = $profile->bookings()->create([
+            $booking = Profile::find($this->profile_id)->bookings()->create([
                 'room_id' => $this->room->id,
                 'check_in_date' => $this->check_in_date,
                 'check_out_date' => $this->check_out_date,
@@ -119,7 +131,7 @@ class CreateForm extends Component
             ]);
 
             return redirect()->route('payment.mockup', [
-                'payment_id' => $payment->id
+                'payment' => $payment
             ]);
         });
     }

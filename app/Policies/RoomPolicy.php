@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -29,9 +30,7 @@ class RoomPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -39,9 +38,7 @@ class RoomPolicy
      */
     public function update(User $user, Room $room): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -49,9 +46,7 @@ class RoomPolicy
      */
     public function delete(User $user, Room $room): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -59,9 +54,7 @@ class RoomPolicy
      */
     public function restore(User $user, Room $room): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -69,8 +62,6 @@ class RoomPolicy
      */
     public function forceDelete(User $user, Room $room): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 }

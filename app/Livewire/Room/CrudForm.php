@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Livewire;
+namespace App\Livewire\Room;
 
 use App\Models\Room;
 use App\Enums\Role;
@@ -8,9 +8,11 @@ use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class RoomComponent extends Component
+class CrudForm extends Component
 {
+    use AuthorizesRequests;
     use WithPagination;
 
     public $perPage = 10;
@@ -29,24 +31,24 @@ class RoomComponent extends Component
     public int $beds;
     public string $name;
     public string $description;
-    public float $price_per_night;
+    public string $price_per_night;
 
-    public function mount()
+    public function mount(): void
     {
         $this->clearFormAttributes();
     }
 
-    public function clearFormAttributes()
+    public function clearFormAttributes(): void
     {
         $this->number = 0;
         $this->capacity = 0;
         $this->beds = 0;
         $this->name = '';
         $this->description = '';
-        $this->price_per_night = 0;
+        $this->price_per_night = '';
     }
 
-    private function getRoomData()
+    private function getRoomData(): array
     {
         return [
             'number' => $this->number,
@@ -60,29 +62,45 @@ class RoomComponent extends Component
 
     protected function rules(): array
     {
-        return (new StoreRoomRequest())->rules();
+        return ($this->currentRoom
+                    ? new UpdateRoomRequest()
+                    : new StoreRoomRequest()
+                )->rules(optional($this->currentRoom)->id);
     }
 
     public function messages(): array
     {
-        return (new StoreRoomRequest())->messages();
+        return ($this->currentRoom
+                    ? new UpdateRoomRequest()
+                    : new StoreRoomRequest()
+                )->messages();
     }
 
-    public function openRoomCreate()
+    private function authorizeFormRequest(): bool
+    {
+        return ($this->currentRoom
+                    ? new UpdateRoomRequest()
+                    : new StoreRoomRequest()
+                )->authorize();
+    }
+
+    public function openRoomCreate(): void
     {
         $this->isRoomCreateOpen = true;
     }
 
-    public function closeRoomCreate()
+    public function closeRoomCreate(): void
     {
         $this->isRoomCreateOpen = false;
         $this->clearFormAttributes();
         $this->resetErrorBag();
     }
 
-    public function storeRoom()
+    public function storeRoom(): void
     {
+        $this->authorize('create', Room::class);
         $this->validate();
+        $this->authorizeFormRequest();
         try {
             Room::create($this->getRoomData());
             $this->closeRoomCreate();
@@ -93,23 +111,21 @@ class RoomComponent extends Component
         }
     }
 
-    public function openRoomEdit(string $id)
+    public function openRoomEdit(string $id): void
     {
         $this->currentRoom = Room::find($id);
         if ($this->currentRoom) {
+            $this->number = $this->currentRoom->number;
+            $this->capacity = $this->currentRoom->capacity;
+            $this->beds = $this->currentRoom->beds;
             $this->name = $this->currentRoom->name;
-            $this->phone = $this->currentRoom->phone;
-            $this->phone_2 = $this->currentRoom->phone_2;
-            $this->address = $this->currentRoom->address;
-            $this->city = $this->currentRoom->city;
-            $this->state = $this->currentRoom->state;
-            $this->postal_code = $this->currentRoom->postal_code;
-            $this->country = $this->currentRoom->country;
+            $this->description = $this->currentRoom->description;
+            $this->price_per_night = $this->currentRoom->price_per_night;
             $this->isRoomEditOpen = true;
         }
     }
 
-    public function closeRoomEdit()
+    public function closeRoomEdit(): void
     {
         $this->isRoomEditOpen = false;
         $this->currentRoom = null;
@@ -117,9 +133,11 @@ class RoomComponent extends Component
         $this->resetErrorBag();
     }
 
-    public function updateRoom()
+    public function updateRoom(): void
     {
+        $this->authorize('update', $this->currentRoom);
         $this->validate();
+        $this->authorizeFormRequest();
         try {
             if ($this->currentRoom->exists()) {
                 $this->currentRoom->update($this->getRoomData());
@@ -131,19 +149,20 @@ class RoomComponent extends Component
         }
     }
 
-    public function openRoomDelete(string $id)
+    public function openRoomDelete(string $id): void
     {
         $this->isRoomDeleteOpen = true;
         $this->currentRoom = Room::find($id);
     }
 
-    public function closeRoomDelete()
+    public function closeRoomDelete(): void
     {
         $this->isRoomDeleteOpen = false;
     }
 
-    public function destroyRoom()
+    public function destroyRoom(): void
     {
+        $this->authorize('delete', $this->currentRoom);
         try {
             if ($this->currentRoom->exists()) {
                 $this->currentRoom->delete();
@@ -155,12 +174,11 @@ class RoomComponent extends Component
         }
     }
 
-    public function sortBy($field)
+    public function sortBy($field): void
     {
         $this->sortDirection = $this->sortField === $field ?
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc' : 'asc';
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc' : 'asc';
         $this->sortField = $field;
-
     }
 
     public function render()

@@ -3,21 +3,24 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Role;
 
 class StoreBookingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function authorize(string $profile_id = null): bool
     {
-        // Ensure profile_id is present in the request
-        $this->validate(['profile_id' => 'required']);
+        if ($profile_id === null) {
+            // Ensure profile_id is present in the request
+            $this->validate(['profile_id' => 'required']);
+        }
 
-        $user = Auth::user();
+        $user = request()->user();
 
         // Check if the user is staff or owns the profile
-        return $user->hasRole('staff') || $user->ownsProfile($this->input('profile_id'));
+        return $user->hasRole(Role::STAFF) || $user->ownsProfile($profile_id ?? $this->input('profile_id'));
     }
 
     /**

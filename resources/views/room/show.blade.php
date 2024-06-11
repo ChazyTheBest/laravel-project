@@ -14,6 +14,8 @@
                         <span class="font-semibold text-gray-600 dark:text-gray-500">{{ $room->number }}</span>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ $room->name }}</h3>
                         <p class="text-gray-500 dark:text-gray-400">{{ $room->description }}</p>
+                        <p class="text-gray-500 dark:text-gray-400">{{ trans_choice('Accommodation: :capacity guest|Accommodation: :capacity guests', $room->capacity, ['capacity' => $room->capacity]) }}</p>
+                        <p class="text-gray-500 dark:text-gray-400">{{ __('# of beds: :beds', ['beds' => $room->beds]) }}</p>
                         <div class="flex flex-col md:flex-row mt-4 justify-center">
                             <div class="mb-4 md:mb-0">
                                 <label for="check_in_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Check-in Date</label>
@@ -40,6 +42,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const appTimezone = "{{ config('app.timezone') }}";
             const form = document.getElementById('roomForm');
             const checkInDateInput = document.getElementById('check_in_date');
             const checkOutDateInput = document.getElementById('check_out_date');
@@ -48,6 +51,8 @@
             const totalPriceElement = document.getElementById('totalPrice').querySelector('span');
             const calculateButton = document.getElementById('calculateTotalPrice');
             const pricePerNight = {{ $room->price_per_night }};
+            const unavailableDates = {{ $room->getUnavailableDates() }};
+            const now = new Date();
 
             const rules = @json($rules);
             const messages = @json($messages);
@@ -60,6 +65,10 @@
             function hideError(element) {
                 element.innerText = '';
                 element.classList.add('hidden');
+            }
+
+            function customDate(value = new Date()) {
+                return new Date(value.toLocaleString('en-US', {timeZone: appTimezone}));
             }
 
             function validateDate(input, rules, messages, errorElement) {

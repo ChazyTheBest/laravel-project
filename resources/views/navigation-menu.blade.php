@@ -13,12 +13,39 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Home') }}
                     </x-nav-link>
 
-                    <x-nav-link href="{{ route('room.index') }}" :active="request()->routeIs(['room.index', 'room.show'])">
-                        {{ __('Our Rooms') }}
-                    </x-nav-link>
+                    @guest
+                        <!-- Display the link for guests (unauthenticated users) -->
+                        <x-nav-link href="{{ route('room.index') }}" :active="request()->routeIs(['room.index', 'room.show'])">
+                            {{ __('Our Rooms') }}
+                        </x-nav-link>
+                    @else
+                        <!-- Display the link for authenticated users -->
+                        @unless(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                            <x-nav-link href="{{ route('room.index') }}" :active="request()->routeIs(['room.index', 'room.show'])">
+                                {{ __('Our Rooms') }}
+                            </x-nav-link>
+                        @endunless
+                    @endguest
+
+                    @auth
+                        @if(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                            <x-nav-link href="{{ route('admin.user') }}" :active="request()->routeIs(['admin.user'])">
+                                {{ __('Users') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('profile.index') }}" :active="request()->routeIs(['profile.index'])">
+                                {{ __('Profiles') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('admin.room') }}" :active="request()->routeIs(['admin.room'])">
+                                {{ __('Rooms') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('admin.booking') }}" :active="request()->routeIs(['admin.booking'])">
+                                {{ __('Bookings') }}
+                            </x-nav-link>
+                        @endif
+                    @endauth
                 </div>
             </div>
 
@@ -107,9 +134,17 @@
                                     {{ __('Account') }}
                                 </x-dropdown-link>
 
-                                <x-dropdown-link href="{{ route('profiles') }}">
+                                <!-- Profiles Management -->
+                                <x-dropdown-link href="{{ route('profile.index') }}">
                                     {{ __('Profiles') }}
                                 </x-dropdown-link>
+
+                                @unless(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                                    <!-- Bookings Management -->
+                                    <x-dropdown-link href="{{ route('booking.index') }}">
+                                        {{ __('Bookings') }}
+                                    </x-dropdown-link>
+                                @endunless
 
                                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                     <x-dropdown-link href="{{ route('api-tokens.index') }}">
@@ -166,8 +201,39 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Home') }}
             </x-responsive-nav-link>
+
+            @guest
+                <!-- Display the link for guests (unauthenticated users) -->
+                <x-responsive-nav-link href="{{ route('room.index') }}" :active="request()->routeIs(['room.index', 'room.show'])">
+                    {{ __('Our Rooms') }}
+                </x-responsive-nav-link>
+            @else
+                <!-- Display the link for authenticated users -->
+                @unless(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                    <x-responsive-nav-link href="{{ route('room.index') }}" :active="request()->routeIs(['room.index', 'room.show'])">
+                        {{ __('Our Rooms') }}
+                    </x-responsive-nav-link>
+                @endunless
+            @endguest
+
+            @auth
+                @if(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                    <x-responsive-nav-link href="{{ route('admin.user') }}" :active="request()->routeIs(['admin.user'])">
+                        {{ __('Users') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('profile.index') }}" :active="request()->routeIs(['profile.index'])">
+                        {{ __('Profiles') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.room') }}" :active="request()->routeIs(['admin.room'])">
+                        {{ __('Rooms') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.booking') }}" :active="request()->routeIs(['admin.booking'])">
+                        {{ __('Bookings') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->
@@ -193,9 +259,16 @@
                     </x-responsive-nav-link>
 
                     <!-- Profiles Management -->
-                    <x-responsive-nav-link href="{{ route('profiles') }}" :active="request()->routeIs('profiles')">
+                    <x-responsive-nav-link href="{{ route('profile.index') }}" :active="request()->routeIs('profile.index')">
                         {{ __('Profiles') }}
                     </x-responsive-nav-link>
+
+                    @unless(auth()->user()->hasRole(\App\Enums\Role::STAFF))
+                        <!-- Bookings Management -->
+                        <x-responsive-nav-link href="{{ route('profile.index') }}" :active="request()->routeIs('profile.index')">
+                            {{ __('Bookings') }}
+                        </x-responsive-nav-link>
+                    @endunless
 
                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                         <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">

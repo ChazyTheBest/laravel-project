@@ -106,4 +106,9 @@ class User extends Authenticatable// implements MustVerifyEmail
     {
         return $this->role === $role;
     }
+
+    public function bookings()
+    {
+        return $this->hasManyThrough(Booking::class, Profile::class);
+    }
 }

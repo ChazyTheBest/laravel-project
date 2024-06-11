@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\BillingInfo;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -13,9 +14,7 @@ class BillingInfoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -25,9 +24,7 @@ class BillingInfoPolicy
     {
         $billingInfo = BillingInfo::with('payment.booking.profile')->find($billingInfo->id);
 
-        return $user->hasRole('staff') || $user->id === $billingInfo->payment->booking->profile->user_id
-                    ? Response::allow()
-                    : Response::deny('You do not own the selected billing information.');
+        return $user->hasRole(Role::STAFF) || $user->id === $billingInfo->payment->booking->profile->user_id;
     }
 
     /**
@@ -43,9 +40,7 @@ class BillingInfoPolicy
      */
     public function update(User $user, BillingInfo $billingInfo): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -53,9 +48,7 @@ class BillingInfoPolicy
      */
     public function delete(User $user, BillingInfo $billingInfo): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -63,9 +56,7 @@ class BillingInfoPolicy
      */
     public function restore(User $user, BillingInfo $billingInfo): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -73,8 +64,6 @@ class BillingInfoPolicy
      */
     public function forceDelete(User $user, BillingInfo $billingInfo): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 }

@@ -21,7 +21,7 @@
     </div>
     <div class="col-span-6 sm:col-span-4">
         <x-label for="description" value="{{ __('Description') }}" />
-        <textarea id="description" class="mt-1 block w-full" wire:model="description"></textarea>
+        <x-input id="description" type="text" class="mt-1 block w-full" wire:model="description" />
         <x-input-error for="description" class="mt-2" />
     </div>
     <div class="col-span-6 sm:col-span-4">

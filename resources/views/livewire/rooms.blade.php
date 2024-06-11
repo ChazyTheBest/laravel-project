@@ -15,21 +15,24 @@
             <x-table wire:loading.class="opacity-75">
                 <x-slot name="header">
                     <x-table.header>ID</x-table.header>
+                    <x-table.header sortable wire:click.prevent="sortBy('number')"
+                        :direction="$sortField === 'number' ? $sortDirection : null">{{ __('Room #') }}</x-table.header>
                     <x-table.header sortable wire:click.prevent="sortBy('name')"
-                        :direction="$sortField === 'name' ? $sortDirection : null">{{ __('Name') }}</x-table.header>
-                    <x-table.header sortable wire:click.prevent="sortBy('phone')"
-                        :direction="$sortField === 'phone' ? $sortDirection : null">{{ __('Phone') }}</x-table.header>
-                    <x-table.header sortable wire:click.prevent="sortBy('address')"
-                        :direction="$sortField === 'address' ? $sortDirection : null">{{ __('Address') }}</x-table.header>
+                        :direction="$sortField === 'name' ? $sortDirection : null">{{ __('Room Name') }}</x-table.header>
+                    <x-table.header sortable wire:click.prevent="sortBy('capacity')"
+                        :direction="$sortField === 'capacity' ? $sortDirection : null">{{ __('Capacity') }}</x-table.header>
+                    <x-table.header sortable wire:click.prevent="sortBy('price_per_night')"
+                        :direction="$sortField === 'price_per_night' ? $sortDirection : null">{{ __('Price Per Night') }}</x-table.header>
                     <x-table.header>Action</x-table.header>
                 </x-slot>
                 <x-slot name="body">
                     @forelse ($rooms as $key => $room)
                         <x-table.row>
                             <x-table.cell>{{ $room->id }}</x-table.cell>
+                            <x-table.cell>{{ $room->number }}</x-table.cell>
                             <x-table.cell>{{ $room->name }}</x-table.cell>
-                            <x-table.cell>{{ $room->phone }}</x-table.cell>
-                            <x-table.cell>{{ $room->address }}</x-table.cell>
+                            <x-table.cell>{{ $room->capacity }}</x-table.cell>
+                            <x-table.cell>{{ $room->price_per_night }}</x-table.cell>
                             <x-table.cell>
                                 <button wire:click="openRoomEdit('{{ $room->id }}')"
                                     class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ __('Edit') }}</button>

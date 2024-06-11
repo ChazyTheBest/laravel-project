@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Livewire;
+namespace App\Livewire\Profile;
 
 use App\Models\Profile;
 use App\Enums\Role;
@@ -10,9 +10,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class ProfileComponent extends Component
+class CrudForm extends Component
 {
+    use AuthorizesRequests;
     use WithPagination;
 
     public $perPage = 10;
@@ -35,12 +37,12 @@ class ProfileComponent extends Component
     public string $postal_code;
     public string $country;
 
-    public function mount()
+    public function mount(): void
     {
         $this->clearFormAttributes();
     }
 
-    public function clearFormAttributes()
+    public function clearFormAttributes(): void
     {
         $this->name = '';
         $this->phone = '';
@@ -52,7 +54,7 @@ class ProfileComponent extends Component
         $this->country = '';
     }
 
-    private function getProfileData()
+    private function getProfileData(): array
     {
         return [
             'name' => $this->name,
@@ -68,29 +70,45 @@ class ProfileComponent extends Component
 
     protected function rules(): array
     {
-        return (new StoreProfileRequest())->rules();
+        return ($this->currentProfile
+                    ? new StoreProfileRequest()
+                    : new UpdateProfileRequest()
+                )->rules();
     }
 
     public function messages(): array
     {
-        return (new StoreProfileRequest())->messages();
+        return ($this->currentProfile
+                    ? new StoreProfileRequest()
+                    : new UpdateProfileRequest()
+                )->messages();
     }
 
-    public function openProfileCreate()
+    private function authorizeFormRequest(): bool
+    {
+        return ($this->currentProfile
+                    ? new StoreProfileRequest()
+                    : new UpdateProfileRequest()
+                )->authorize();
+    }
+
+    public function openProfileCreate(): void
     {
         $this->isProfileCreateOpen = true;
     }
 
-    public function closeProfileCreate()
+    public function closeProfileCreate(): void
     {
         $this->isProfileCreateOpen = false;
         $this->clearFormAttributes();
         $this->resetErrorBag();
     }
 
-    public function storeProfile()
+    public function storeProfile(): void
     {
+        $this->authorize('create', Profile::class);
         $this->validate();
+        $this->authorizeFormRequest();
         try {
             Auth::user()->profiles()->create($this->getProfileData());
             $this->closeProfileCreate();
@@ -100,7 +118,7 @@ class ProfileComponent extends Component
         }
     }
 
-    public function openProfileEdit(string $id)
+    public function openProfileEdit(string $id): void
     {
         $this->currentProfile = $this->fetchProfiles()->find($id);
         if ($this->currentProfile) {
@@ -116,7 +134,7 @@ class ProfileComponent extends Component
         }
     }
 
-    public function closeProfileEdit()
+    public function closeProfileEdit(): void
     {
         $this->isProfileEditOpen = false;
         $this->currentProfile = null;
@@ -124,9 +142,11 @@ class ProfileComponent extends Component
         $this->resetErrorBag();
     }
 
-    public function updateProfile()
+    public function updateProfile(): void
     {
+        $this->authorize('update', $this->currentProfile);
         $this->validate();
+        $this->authorizeFormRequest();
         try {
             if ($this->currentProfile->exists()) {
                 $this->currentProfile->update($this->getProfileData());
@@ -138,19 +158,20 @@ class ProfileComponent extends Component
         }
     }
 
-    public function openProfileDelete(string $id)
+    public function openProfileDelete(string $id): void
     {
         $this->isProfileDeleteOpen = true;
         $this->currentProfile = $this->fetchProfiles()->find($id);
     }
 
-    public function closeProfileDelete()
+    public function closeProfileDelete(): void
     {
         $this->isProfileDeleteOpen = false;
     }
 
-    public function destroyProfile()
+    public function destroyProfile(): void
     {
+        $this->authorize('delete', $this->currentProfile);
         try {
             if ($this->currentProfile->exists()) {
                 $this->currentProfile->delete();
@@ -162,10 +183,10 @@ class ProfileComponent extends Component
         }
     }
 
-    public function sortBy($field)
+    public function sortBy($field): void
     {
         $this->sortDirection = $this->sortField === $field ?
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc' : 'asc';
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc' : 'asc';
         $this->sortField = $field;
 
     }

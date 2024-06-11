@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -21,9 +22,7 @@ class ProfilePolicy
      */
     public function view(User $user, Profile $profile): bool
     {
-        return $user->hasRole('staff') || $user->id === $profile->user_id
-                    ? Response::allow()
-                    : Response::deny('You do not own the selected profile.');
+        return $user->hasRole(Role::STAFF) || $user->id === $profile->user_id;
     }
 
     /**
@@ -39,9 +38,7 @@ class ProfilePolicy
      */
     public function update(User $user, Profile $profile): bool
     {
-        return $user->hasRole('staff') || $user->id === $profile->user_id
-                    ? Response::allow()
-                    : Response::deny('You do not own the selected profile.');
+        return $user->hasRole(Role::STAFF) || $user->id === $profile->user_id;
     }
 
     /**
@@ -49,9 +46,7 @@ class ProfilePolicy
      */
     public function delete(User $user, Profile $profile): bool
     {
-        return $user->hasRole('staff') || $user->id === $profile->user_id
-                    ? Response::allow()
-                    : Response::deny('You do not own the selected profile.');
+        return $user->hasRole(Role::STAFF) || $user->id === $profile->user_id;
     }
 
     /**
@@ -59,9 +54,7 @@ class ProfilePolicy
      */
     public function restore(User $user, Profile $profile): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 
     /**
@@ -69,8 +62,6 @@ class ProfilePolicy
      */
     public function forceDelete(User $user, Profile $profile): bool
     {
-        return $user->hasRole('staff')
-                    ? Response::allow()
-                    : Response::deny('You are not authorized to perform this action.');
+        return $user->hasRole(Role::STAFF);
     }
 }

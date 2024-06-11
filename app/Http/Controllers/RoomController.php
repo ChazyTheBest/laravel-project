@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -10,7 +10,7 @@ class RoomController extends Controller
 {
     public function index()
     {
-        return view('rooms', [
+        return view('room.index', [
             'rooms' => Room::all()
         ]);
     }
