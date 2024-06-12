@@ -48,14 +48,6 @@ class Payment extends Model
     }
 
     /**
-     * Get the payment status.
-     */
-    public function status()
-    {
-        return $this->hasOne(PaymentStatus::class);
-    }
-
-    /**
      * Get the payment billing information.
      */
     public function billingInfo()

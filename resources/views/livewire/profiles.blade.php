@@ -99,6 +99,9 @@
         </x-slot>
 
         <x-slot name="footer">
+            <x-action-message class="me-3" on="destroyError">
+                {{ __('Cannot delete profile because it was used to book rooms.') }}
+            </x-action-message>
             <x-secondary-button wire:click.prevent="closeProfileDelete">
                 {{ __('Cancel') }}
             </x-secondary-button>

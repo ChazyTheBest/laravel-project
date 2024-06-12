@@ -44,6 +44,9 @@
                             <x-nav-link href="{{ route('admin.booking') }}" :active="request()->routeIs(['admin.booking'])">
                                 {{ __('Bookings') }}
                             </x-nav-link>
+                            <x-nav-link href="{{ route('admin.payment') }}" :active="request()->routeIs(['admin.payment'])">
+                                {{ __('Payments') }}
+                            </x-nav-link>
                         @endif
                     @endauth
                 </div>
@@ -231,6 +234,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.booking') }}" :active="request()->routeIs(['admin.booking'])">
                         {{ __('Bookings') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.payment') }}" :active="request()->routeIs(['admin.payment'])">
+                        {{ __('Payments') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth

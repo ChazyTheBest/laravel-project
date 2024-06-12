@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\BookingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\BookingStatus;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Booking extends Model
 {
@@ -44,7 +46,7 @@ class Booking extends Model
     /**
      * Get the profile that owns the booking.
      */
-    public function profile()
+    public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class);
     }
@@ -52,7 +54,7 @@ class Booking extends Model
     /**
      * Get the booked room.
      */
-    public function room()
+    public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
     }
@@ -60,7 +62,7 @@ class Booking extends Model
     /**
      * Get the payment for the booking.
      */
-    public function payment()
+    public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
     }

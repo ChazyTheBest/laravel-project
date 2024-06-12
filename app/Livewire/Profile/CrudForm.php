@@ -180,6 +180,7 @@ class CrudForm extends Component
             session()->flash('success', 'Profile deleted successfully!');
         } catch (\Exception $ex) {
             session()->flash('error', 'Something goes wrong!!');
+            $this->dispatch('destroyError');
         }
     }
 

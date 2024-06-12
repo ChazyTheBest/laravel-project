@@ -42,7 +42,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const appTimezone = "{{ config('app.timezone') }}";
             const form = document.getElementById('roomForm');
             const checkInDateInput = document.getElementById('check_in_date');
             const checkOutDateInput = document.getElementById('check_out_date');
@@ -51,11 +50,23 @@
             const totalPriceElement = document.getElementById('totalPrice').querySelector('span');
             const calculateButton = document.getElementById('calculateTotalPrice');
             const pricePerNight = {{ $room->price_per_night }};
-            const unavailableDates = {{ $room->getUnavailableDates() }};
-            const now = new Date();
-
             const rules = @json($rules);
+            const checkInDateRules = rules.check_in_date.split('|');
             const messages = @json($messages);
+            const unavailableDates = @json($room->getUnavailableDates());
+            const appTimezone = "{{ config('app.timezone') }}";
+            const now = new Date();
+            const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString().split('T')[0];
+
+            let tomorrow = new Date(now);
+            let dayAfterTomorrow = new Date(now);
+            let checkInDateMin = null;
+
+            tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+            tomorrow = tomorrow.toISOString().split('T')[0];
+
+            dayAfterTomorrow.setUTCDate(dayAfterTomorrow.getUTCDate() + 2);
+            dayAfterTomorrow = dayAfterTomorrow.toISOString().split('T')[0];
 
             function showError(element, message) {
                 element.innerText = message;
@@ -67,12 +78,26 @@
                 element.classList.add('hidden');
             }
 
-            function customDate(value = new Date()) {
-                return new Date(value.toLocaleString('en-US', {timeZone: appTimezone}));
+            function convertToUTCDateString(inputDate) {
+                // Parse the input date string into its individual components
+                const [year, month, day] = inputDate.split('-').map(Number);
+
+                // Create a new Date object with the parsed components (using 0-based month)
+                const utcDate = new Date(Date.UTC(year, month - 1, day));
+
+                // Get the UTC date components
+                const utcYear = utcDate.getUTCFullYear();
+                const utcMonth = utcDate.getUTCMonth() + 1; // Add 1 because months are zero-based
+                const utcDay = utcDate.getUTCDate();
+
+                // Format the UTC date string as 'YYYY-MM-DD'
+                const utcDateString = `${utcYear}-${utcMonth.toString().padStart(2, '0')}-${utcDay.toString().padStart(2, '0')}`;
+
+                return utcDateString;
             }
 
             function validateDate(input, rules, messages, errorElement) {
-                const value = input.value;
+                const value = convertToUTCDateString(input.value);
                 hideError(errorElement);
 
                 if (rules.includes('required') && !value) {
@@ -86,36 +111,44 @@
                 }
 
                 if (rules.includes('after_or_equal:today')) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const inputDate = new Date(value);
-                    if (inputDate < today) {
+                    if (value < today) {
                         showError(errorElement, messages[input.id + '.after_or_equal']);
                         return false;
                     }
                 }
 
                 if (rules.includes('after:today')) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const inputDate = new Date(value);
-                    if (inputDate <= today) {
+                    if (value <= today) {
                         showError(errorElement, messages[input.id + '.after']);
                         return false;
                     }
                 }
 
                 if (rules.includes('after:check_in_date')) {
-                    const checkInDate = new Date(checkInDateInput.value);
-                    const checkOutDate = new Date(value);
+                    const checkInDate = checkInDateInput.value;
+                    const checkOutDate = value;
                     if (checkOutDate <= checkInDate) {
                         showError(errorElement, messages[input.id + '.after']);
                         return false;
                     }
                 }
 
+                if (unavailableDates.includes(value)) {
+                    showError(errorElement, messages[input.id + '.availability']);
+                    return false;
+                }
+
                 return true;
             }
+
+            if (checkInDateRules.includes('after_or_equal:today')) {
+                checkInDateMin = today;
+            } else if (checkInDateRules.includes('after:today')) {
+                checkInDateMin = tomorrow;
+            }
+
+            checkInDateInput.min = checkInDateMin;
+            checkOutDateInput.min = dayAfterTomorrow;
 
             checkInDateInput.addEventListener('change', () => {
                 validateDate(checkInDateInput, rules.check_in_date.split('|'), messages['check_in_date'], checkInErrorDiv);
@@ -131,10 +164,9 @@
                     return;
                 }
 
-                const checkInDate = new Date(checkInDateInput.value);
-                const checkOutDate = new Date(checkOutDateInput.value);
-                const timeDifference = checkOutDate - checkInDate;
-                const dayDifference = timeDifference / (1000 * 3600 * 24);
+                const checkInDate = new Date(convertToUTCDateString(checkInDateInput.value));
+                const checkOutDate = new Date(convertToUTCDateString(checkOutDateInput.value));
+                const dayDifference = (checkOutDate - checkInDate) / (1000 * 3600 * 24);
 
                 if (dayDifference > 0) {
                     totalPriceElement.innerText = (dayDifference * pricePerNight).toFixed(2);

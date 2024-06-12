@@ -58,23 +58,33 @@ class Room extends Model
 
     public function getUnavailableDates()
     {
-        $bookings = $this->bookings()->where('status', BookingStatus::CONFIRMED);
+        // Fetch all confirmed bookings related to the instance calling the method
+        $bookings = $this->bookings()
+                        ->where('status', BookingStatus::CONFIRMED)
+                        ->where('check_out_date', '>=', Carbon::now(config('app.timezone'))->toDateString())
+                        ->get();
 
-        $today = Carbon::now(config('app.timezone'));
-        $latestBookedDate = $bookings->where('check_out_date', '>=', $today)
-                                    ->orderBy('check_out_date', 'asc')
-                                    ->value('check_out_date');
+        $unavailableDates = [];
 
-        if (!$latestBookedDate) {
-            return [];
+        // Iterate through each booking to check for overlaps
+        foreach ($bookings as $booking) {
+            // Get the check-in and check-out dates of the current booking
+            $checkInDate = $booking->check_in_date;
+            $checkOutDate = $booking->check_out_date;
+
+            // Iterate through the dates in the range of the current booking
+            $currentDate = Carbon::parse($checkInDate);
+            $endDate = Carbon::parse($checkOutDate);
+            while ($currentDate->lte($endDate)) {
+                // Check if the current date is already marked as unavailable
+                if (!in_array($currentDate->toDateString(), $unavailableDates)) {
+                    // Mark the current date as unavailable
+                    $unavailableDates[] = $currentDate->toDateString();
+                }
+                // Move to the next date
+                $currentDate->addDay();
+            }
         }
-
-        $unavailableDates = $bookings->where('check_in_date', '>=', $today)
-                                    ->where('check_out_date', '<=', $latestBookedDate)
-                                    ->pluck('check_in_date')
-                                    ->merge($bookings->pluck('check_out_date'))
-                                    ->unique()
-                                    ->toArray();
 
         return $unavailableDates;
     }

@@ -4,23 +4,22 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Role;
+use App\Rules\RoomAvailability;
 
 class StoreBookingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(string $profile_id = null): bool
+    public function authorize(): bool
     {
-        if ($profile_id === null) {
-            // Ensure profile_id is present in the request
-            $this->validate(['profile_id' => 'required']);
-        }
+        // Ensure profile_id is present in the request
+        $this->validate(['profile_id' => 'required']);
 
         $user = request()->user();
 
         // Check if the user is staff or owns the profile
-        return $user->hasRole(Role::STAFF) || $user->ownsProfile($profile_id ?? $this->input('profile_id'));
+        return $user->hasRole(Role::STAFF) || $user->ownsProfile($this->input('profile_id'));
     }
 
     /**
@@ -42,7 +41,11 @@ class StoreBookingRequest extends FormRequest
     {
         return [
             'profile_id' => 'required|exists:profile,id',
-            'room_id' => 'required|exists:room,id',
+            'room_id' => [
+                'required',
+                'exists:room,id',
+                new RoomAvailability,
+            ],
             'check_in_date' => 'required|date|after:today',
             'check_out_date' => 'required|date|after:check_in_date',
         ];
@@ -63,9 +66,11 @@ class StoreBookingRequest extends FormRequest
             'check_in_date.required' => 'The check-in date field is required.',
             'check_in_date.date' => 'The check-in date must be a valid date.',
             'check_in_date.after' => 'The check-in date must be a future date after today.',
+            'check_in_date.availability' => 'The selected date is not available.',
             'check_out_date.required' => 'The check-out date field is required.',
             'check_out_date.date' => 'The check-out date must be a valid date.',
             'check_out_date.after' => 'The check-out date must be after the check-in date.',
+            'check_out_date.availability' => 'The selected date is not available.',
         ];
     }
 }

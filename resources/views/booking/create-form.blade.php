@@ -17,7 +17,8 @@
 
         <div class="col-span-6 sm:col-span-4">
             <x-label for="profile" value="{{ __('Select Profile') }}:" />
-            <x-select value="" :options="$profiles" class="mt-1 block w-full" id="profile" wire:model="profile_id"></x-select>
+            <x-select :options="$profiles" class="mt-1 block w-full" id="profile" wire:model="profile_id"></x-select>
+            <x-input-error for="profile_id" class="mt-2" />
         </div>
 
         <div class="col-span-6 sm:col-span-4">
@@ -74,6 +75,7 @@
     </x-slot>
 
     <x-slot name="actions">
+        <x-input-error for="room_id" />
         <x-button>
             {{ __('Save') }}
         </x-button>

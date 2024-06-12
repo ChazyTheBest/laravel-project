@@ -40,8 +40,8 @@ class CreateForm extends Component
         $this->profiles = $this->user->profiles()->get();
 
         if ($this->profiles->isNotEmpty()) {
-            $this->profile_id = $this->profiles->first()->id;
             $profile = $this->profiles->first();
+            $this->profile_id = $profile->id;
             $this->address = $profile->address;
             $this->city = $profile->city;
             $this->state = $profile->state;
@@ -69,6 +69,13 @@ class CreateForm extends Component
 
     public function rules()
     {
+        $request = new StoreBookingRequest();
+        $request->merge([
+            'profile_id' => $this->profile_id,
+            'room_id' => $this->room_id,
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date,
+        ]);
         return [
             ...(new StoreBookingRequest())->rules(),
             ...(new StoreBillingInfoRequest())->rules(),
@@ -89,7 +96,11 @@ class CreateForm extends Component
 
     public function authorizeCreateBookingRequest(): bool
     {
-        return (new StoreBookingRequest())->authorize($this->profile_id.'');
+        $request = new StoreBookingRequest();
+        $request->merge([
+            'profile_id' => $this->profile_id,
+        ]);
+        return $request->authorize();
     }
 
     public function authorizeCreateBillingInfoRequest(): bool
