@@ -54,7 +54,14 @@ class CrudForm extends Component
 
     protected function rules(): array
     {
-        return (new UpdateBookingRequest())->rules();
+        $request = new UpdateBookingRequest();
+        $request->merge([
+            'profile_id' => $this->profile_id,
+            'room_id' => $this->room_id,
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date,
+        ]);
+        return $request->rules();
     }
 
     public function messages(): array
@@ -64,7 +71,11 @@ class CrudForm extends Component
 
     public function authorizeFormRequest(): bool
     {
-        return (new UpdateBookingRequest())->authorize();
+        $request = new UpdateBookingRequest();
+        $request->merge([
+            'profile_id' => $this->profile_id,
+        ]);
+        return $request->authorize();
     }
 
     public function openBookingEdit(string $id)

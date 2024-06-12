@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Role;
+use App\Rules\RoomAvailability;
 
 class UpdateBookingRequest extends FormRequest
 {
@@ -40,7 +41,11 @@ class UpdateBookingRequest extends FormRequest
     {
         return request()->user()->hasRole(Role::STAFF) ? [
             'profile_id' => 'required|exists:profile,id',
-            'room_id' => 'required|exists:room,id',
+            'room_id' => [
+                'required',
+                'exists:room,id',
+                new RoomAvailability,
+            ],
             'check_in_date' => 'required|date|after:today',
             'check_out_date' => 'required|date|after:check_in_date',
         ] : [
