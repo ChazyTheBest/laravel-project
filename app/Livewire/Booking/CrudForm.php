@@ -3,7 +3,6 @@
 namespace App\Livewire\Booking;
 
 use App\Models\Booking;
-use App\Enums\Role;
 use App\Http\Requests\UpdateBookingRequest;
 use Livewire\Component;
 use Livewire\WithPagination;

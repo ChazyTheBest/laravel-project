@@ -4,13 +4,15 @@ namespace App\Models;
 
 use App\Enums\BookingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Booking extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -45,6 +47,8 @@ class Booking extends Model
 
     /**
      * Get the profile that owns the booking.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function profile(): BelongsTo
     {
@@ -53,6 +57,8 @@ class Booking extends Model
 
     /**
      * Get the booked room.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function room(): BelongsTo
     {
@@ -61,6 +67,8 @@ class Booking extends Model
 
     /**
      * Get the payment for the booking.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function payment(): HasOne
     {

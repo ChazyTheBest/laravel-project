@@ -6,6 +6,10 @@
 
 <select {{ $attributes->merge(['class' => $classes]) }}>
     @foreach($options as $option)
-        <option value="{{ $option->id }}">{{ $option->name }}</option>
+        @if (is_object($option))
+            <option value="{{ $option->id }}">{{ $option->name }}</option>
+        @else
+            <option value="{{ $option['id'] }}">{{ $option['name'] }}</option>
+        @endif
     @endforeach
 </select>

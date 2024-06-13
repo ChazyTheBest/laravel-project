@@ -3,7 +3,6 @@
 namespace App\Livewire\Room;
 
 use App\Models\Room;
-use App\Enums\Role;
 use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use Livewire\Component;

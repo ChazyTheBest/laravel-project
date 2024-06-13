@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Enums\Role;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
-use App\Enums\Role;
 
 class User extends Authenticatable// implements MustVerifyEmail
 {
@@ -21,6 +23,7 @@ class User extends Authenticatable// implements MustVerifyEmail
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -107,8 +110,23 @@ class User extends Authenticatable// implements MustVerifyEmail
         return $this->role->value === $role->value;
     }
 
-    public function bookings()
+    /**
+     * Get the bookings associated with the user through profiles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function bookings(): HasManyThrough
     {
         return $this->hasManyThrough(Booking::class, Profile::class);
+    }
+
+    /**
+     * Get the teams associated with the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
     }
 }

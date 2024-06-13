@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('check_out_date');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('country');
             $table->foreignId('payment_id')->constrained('payment');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

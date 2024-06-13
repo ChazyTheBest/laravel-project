@@ -3,15 +3,12 @@
 namespace App\Livewire\Payment;
 
 use App\Models\Payment;
-use App\Enums\Role;
 use App\Enums\PaymentStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Table extends Component
 {
-    use AuthorizesRequests;
     use WithPagination;
 
     public $perPage = 10;

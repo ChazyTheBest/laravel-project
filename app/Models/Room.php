@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use App\Enums\BookingStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
 class Room extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -34,13 +37,22 @@ class Room extends Model
 
     /**
      * Get the bookings for the room.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
 
-    public function isAvailable($startDate, $endDate)
+    /**
+     * Whether the room is available or not.
+     *
+     * @param string $startDate The booking check in date.
+     * @param string $endDate The booking check out date.
+     * @return bool True if the room is available, false otherwise.
+     */
+    public function isAvailable($startDate, $endDate): bool
     {
         $bookings = $this->bookings()->where('status', BookingStatus::CONFIRMED)
                                       ->where(function ($query) use ($startDate, $endDate) {
@@ -56,7 +68,12 @@ class Room extends Model
         return !$bookings;
     }
 
-    public function getUnavailableDates()
+    /**
+     * Get the room's unavailable dates.
+     *
+     * @return array<string, string>
+     */
+    public function getUnavailableDates(): array
     {
         // Fetch all confirmed bookings related to the instance calling the method
         $bookings = $this->bookings()

@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use App\Enums\PaymentStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -41,24 +45,30 @@ class Payment extends Model
 
     /**
      * Get the booking that owns the payment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function booking()
+    public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
     }
 
     /**
      * Get the payment billing information.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function billingInfo()
+    public function billingInfo(): HasOne
     {
         return $this->hasOne(BillingInfo::class);
     }
 
     /**
      * Store or append response data.
+     *
+     * @return void
      */
-    public function handleResponseData(array $response)
+    public function handleResponseData(array $response): void
     {
         $responses = $this->response_data ?? [];
         $responses[] = $response;
