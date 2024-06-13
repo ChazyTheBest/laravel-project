@@ -27,49 +27,34 @@ Route::get('/booking/failed', fn () => view('booking.failed'))->name('booking.fa
 Route::middleware('auth')->group(function () {
     Route::get('/admin/bookings', BookingCrudForm::class)
         ->name('admin.booking')
-        /*->middleware([
+        ->middleware([
             'can:viewAny,' . Booking::class,   // Permission to view any booking
-            'can:view,booking',                // Permission to view a specific booking (if relevant)
             'can:create,' . Booking::class,    // Permission to create a booking
-            'can:update,booking',              // Permission to update a specific booking
-            'can:delete,booking',              // Permission to delete a specific booking
-        ])*/;
+        ]);
     Route::get('/admin/payments', PaymentTable::class)
         ->name('admin.payment')
-        /*->middleware([
+        ->middleware([
             'can:viewAny,' . Payment::class,   // Permission to view any payment
-            'can:view,payment',                // Permission to view a specific payment (if relevant)
             'can:create,' . Payment::class,    // Permission to create a payment
-            'can:update,payment',              // Permission to update a specific payment
-            'can:delete,payment',              // Permission to delete a specific payment
-        ])*/;
+        ]);
     Route::get('/profiles', ProfileCrudForm::class)
         ->name('profile.index')
-        /*->middleware([
+        ->middleware([
             'can:viewAny,' . Profile::class,   // Permission to view any profile
-            'can:view,profile',                // Permission to view a specific profile (if relevant)
             'can:create,' . Profile::class,    // Permission to create a profile
-            'can:update,profile',              // Permission to update a specific profile
-            'can:delete,profile',              // Permission to delete a specific profile
-        ])*/;
+        ]);
     Route::get('/admin/rooms', RoomCrudForm::class)
         ->name('admin.room')
-        /*->middleware([
+        ->middleware([
             'can:viewAny,' . Room::class,   // Permission to view any room
-            'can:view,room',                // Permission to view a specific room (if relevant)
             'can:create,' . Room::class,    // Permission to create a room
-            'can:update,room',              // Permission to update a specific room
-            'can:delete,room',              // Permission to delete a specific room
-        ])*/;
+        ]);
     Route::get('/admin/users', UserCrudForm::class)
         ->name('admin.user')
-        /*->middleware([
+        ->middleware([
             'can:viewAny,' . User::class,   // Permission to view any user
-            'can:view,user',                // Permission to view a specific user (if relevant)
             'can:create,' . User::class,    // Permission to create a user
-            'can:update,user',              // Permission to update a specific user
-            'can:delete,user',              // Permission to delete a specific user
-        ])*/;
+        ]);
 
     Route::get('/bookings', [BookingController::class, 'index'])
         ->name('booking.index')
