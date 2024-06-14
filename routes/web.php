@@ -10,6 +10,7 @@ use App\Livewire\Payment\Table as PaymentTable;
 use App\Livewire\Profile\CrudForm as ProfileCrudForm;
 use App\Livewire\Room\CrudForm as RoomCrudForm;
 use App\Livewire\User\CrudForm as UserCrudForm;
+use App\Livewire\Room\Show;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Profile;
@@ -19,7 +20,7 @@ use App\Models\User;
 Route::get('/', fn () => view('dashboard'))->name('dashboard');
 
 Route::get('/rooms', [RoomController::class, 'index'])->name('room.index');
-Route::get('/room/{room}', [RoomController::class, 'show'])->name('room.show');
+Route::get('/room/{room}', Show::class)->name('room.show');
 
 Route::get('/booking/confirmed', fn () => view('booking.confirmed'))->name('booking.confirmed');
 Route::get('/booking/failed', fn () => view('booking.failed'))->name('booking.failed');

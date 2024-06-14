@@ -10,9 +10,11 @@
             <x-slot name="header">
                 <x-table.header>ID</x-table.header>
                 <x-table.header sortable wire:click.prevent="sortBy('profile_id')"
-                    :direction="$sortField === 'profile_id' ? $sortDirection : null">{{ __('Profile ID') }}</x-table.header>
+                    :direction="$sortField === 'profile_id' ? $sortDirection : null">{{ __('Profile') }}</x-table.header>
                 <x-table.header sortable wire:click.prevent="sortBy('room_id')"
-                    :direction="$sortField === 'room_id' ? $sortDirection : null">{{ __('Room ID') }}</x-table.header>
+                    :direction="$sortField === 'room_id' ? $sortDirection : null">{{ __('Room') }}</x-table.header>
+                <x-table.header sortable wire:click.prevent="sortBy('status')"
+                    :direction="$sortField === 'status' ? $sortDirection : null">{{ __('Status') }}</x-table.header>
                 <x-table.header sortable wire:click.prevent="sortBy('check_in_date')"
                     :direction="$sortField === 'check_in_date' ? $sortDirection : null">{{ __('Check-in Date') }}</x-table.header>
                 <x-table.header sortable wire:click.prevent="sortBy('check_out_date')"
@@ -25,6 +27,7 @@
                         <x-table.cell>{{ $booking->id }}</x-table.cell>
                         <x-table.cell>{{ $booking->profile_id }}</x-table.cell>
                         <x-table.cell>{{ $booking->room_id }}</x-table.cell>
+                        <x-table.cell>{{ $booking->status->name }}</x-table.cell>
                         <x-table.cell>{{ $booking->check_in_date }}</x-table.cell>
                         <x-table.cell>{{ $booking->check_out_date }}</x-table.cell>
                         <x-table.cell>

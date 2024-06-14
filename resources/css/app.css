@@ -1,3 +1,4 @@
+@import 'flatpickr/dist/themes/dark.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

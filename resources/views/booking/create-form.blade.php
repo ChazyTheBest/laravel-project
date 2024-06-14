@@ -5,9 +5,9 @@
 
     <x-slot name="description">
         <span>{{ __('We just need a few details before we can book the room for you.') }}</span>
-        <span>Check-in Date: {{ $check_in_date }}</span>
-        <span>Check-out Date: {{ $check_out_date }}</span>
-        <span>Room Price per Night: {{ $room->price_per_night }}</span>
+        <span class="block mt-2">Check-in Date: {{ $check_in_date }}</span>
+        <span class="block mt-2">Check-out Date: {{ $check_out_date }}</span>
+        <span class="block mt-2">Room Price per Night: {{ $room->price_per_night }}</span>
     </x-slot>
 
     <x-slot name="form">

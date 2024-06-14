@@ -2,19 +2,19 @@
 
 namespace App\Livewire\Booking;
 
-use App\Http\Requests\StoreBookingRequest;
+use App\Http\Requests\CheckPaymentMethodRequest;
 use App\Http\Requests\StoreBillingInfoRequest;
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Profile;
 use App\Models\Room;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
 class CreateForm extends Component
 {
     public Room $room;
-    public User $user;
     public object $profiles;
 
     // Booking required data
@@ -33,11 +33,10 @@ class CreateForm extends Component
     public string $postal_code;
     public string $country;
 
-    public function mount(Room $room)
+    public function mount(Room $room, array $bookingDates)
     {
         $this->room = $room;
-        $this->user = Auth::user();
-        $this->profiles = $this->user->profiles()->get();
+        $this->profiles = Auth::user()->profiles()->get();
 
         if ($this->profiles->isNotEmpty()) {
             $profile = $this->profiles->first();
@@ -51,10 +50,8 @@ class CreateForm extends Component
 
         // hidden input elements for re-validation
         $this->room_id = $room->id;
-        $this->check_in_date = request()->input('check_in_date');
-        $this->check_out_date = request()->input('check_out_date');
-
-        return $this->render();
+        $this->check_in_date = $bookingDates['check_in_date'];
+        $this->check_out_date = $bookingDates['check_out_date'];
     }
 
     public function render()
@@ -67,57 +64,76 @@ class CreateForm extends Component
         ]);
     }
 
-    public function rules()
-    {
-        $request = new StoreBookingRequest();
-        $request->merge([
-            'profile_id' => $this->profile_id,
-            'room_id' => $this->room_id,
-            'check_in_date' => $this->check_in_date,
-            'check_out_date' => $this->check_out_date,
-        ]);
-        return [
-            ...(new StoreBookingRequest())->rules(),
-            ...(new StoreBillingInfoRequest())->rules(),
-            'payment_method' => 'required|numeric|in:1,2' // todo abstract payment method names
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            ...(new StoreBookingRequest())->messages(),
-            ...(new StoreBillingInfoRequest())->messages(),
-            'payment_method.required' => 'The payment method is required. Please select one.',
-            'payment_method.numeric' => 'Please select a valid payment method.',
-            'payment_method.in' => 'The selected payment method is invalid.',
-        ];
-    }
-
-    public function authorizeCreateBookingRequest(): bool
-    {
-        $request = new StoreBookingRequest();
-        $request->merge([
-            'profile_id' => $this->profile_id,
-        ]);
-        return $request->authorize();
-    }
-
-    public function authorizeCreateBillingInfoRequest(): bool
-    {
-        return (new StoreBillingInfoRequest())->authorize();
-    }
-
-    public function book()
+    private function authorizeActions(): void
     {
         $this->authorize('create', Booking::class);
         $this->authorize('create', Payment::class);
         $this->authorize('create', BillingInfo::class);
+    }
 
-        $this->authorizeCreateBookingRequest();
-        $this->authorizeCreateBillingInfoRequest();
+    private function validateAndAuthorizeFormRequests(): void
+    {
+        $storeBookingRequest = new StoreBookingRequest();
+        $checkPaymentMethodRequest = new CheckPaymentMethodRequest();
+        $storeBillingInfoRequest = new StoreBillingInfoRequest();
 
-        $this->validate();
+        $bookingRequestData = [
+            'profile_id' => $this->profile_id,
+            'room_id' => $this->room_id,
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date,
+        ];
+
+        $paymentMethodRequestData = [
+            'payment_method' => $this->payment_method,
+        ];
+
+        $billingInfoRequestData = [
+            'address' => $this->address,
+            'city' => $this->city,
+            'state' => $this->state,
+            'postal_code' => $this->postal_code,
+            'country' => $this->country,
+        ];
+
+        $storeBookingRequest->merge($bookingRequestData);
+        //$checkPaymentMethodRequest->merge($paymentMethodRequestData);
+        $storeBillingInfoRequest->merge($billingInfoRequestData);
+
+        $data = [
+            ...$bookingRequestData,
+            ...$paymentMethodRequestData,
+            ...$billingInfoRequestData,
+        ];
+
+        $rules = [
+            ...$storeBookingRequest->rules(),
+            ...$checkPaymentMethodRequest->rules(),
+            ...$storeBillingInfoRequest->rules(),
+        ];
+
+        $messages = [
+            ...$storeBookingRequest->messages(),
+            ...$checkPaymentMethodRequest->messages(),
+            ...$storeBillingInfoRequest->messages(),
+        ];
+
+        Validator::make($data, $rules, $messages)->validate();
+
+        if (!$storeBookingRequest->authorize()) {
+            $storeBookingRequest->failedAuthorization();
+        }
+
+        if (!$storeBillingInfoRequest->authorize()) {
+            $storeBillingInfoRequest->failedAuthorization();
+        }
+    }
+
+    public function book()
+    {
+        $this->authorizeActions();
+
+        $this->validateAndAuthorizeFormRequests();
 
         // Rollback on insert error
         DB::transaction(function () {

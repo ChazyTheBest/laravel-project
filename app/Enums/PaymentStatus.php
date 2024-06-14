@@ -16,4 +16,9 @@ enum PaymentStatus: int {
             default => null,
         };
     }
+
+    public static function getOptions(): array
+    {
+        return array_map(fn($role) => ['id' => $role->value, 'name' => $role->name], self::cases());
+    }
 }

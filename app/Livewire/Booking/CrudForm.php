@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Booking;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Http\Requests\UpdateBookingRequest;
 use Livewire\Component;
@@ -23,8 +24,9 @@ class CrudForm extends Component
     protected $queryString = ['sortField', 'sortDirection'];
 
     // Booking Fields
-    public int $profile_id;
-    public int $room_id;
+    public ?int $profile_id;
+    public ?int $room_id;
+    public BookingStatus $status;
     public string $check_in_date;
     public string $check_out_date;
 
@@ -35,8 +37,9 @@ class CrudForm extends Component
 
     public function clearFormAttributes()
     {
-        $this->profile_id = 0;
-        $this->room_id = 0;
+        $this->profile_id = null;
+        $this->room_id = null;
+        $this->status = BookingStatus::PENDING;
         $this->check_in_date = '';
         $this->check_out_date = '';
     }
@@ -46,6 +49,7 @@ class CrudForm extends Component
         return [
             'profile_id' => $this->profile_id,
             'room_id' => $this->room_id,
+            'status' => $this->status,
             'check_in_date' => $this->check_in_date,
             'check_out_date' => $this->check_out_date,
         ];
@@ -57,6 +61,7 @@ class CrudForm extends Component
         $request->merge([
             'profile_id' => $this->profile_id,
             'room_id' => $this->room_id,
+            'status' => $this->status,
             'check_in_date' => $this->check_in_date,
             'check_out_date' => $this->check_out_date,
         ]);
@@ -83,6 +88,7 @@ class CrudForm extends Component
         if ($this->currentBooking) {
             $this->profile_id = $this->currentBooking->profile_id;
             $this->room_id = $this->currentBooking->room_id;
+            $this->status = $this->currentBooking->status;
             $this->check_in_date = $this->currentBooking->check_in_date;
             $this->check_out_date = $this->currentBooking->check_out_date;
             $this->isBookingEditOpen = true;

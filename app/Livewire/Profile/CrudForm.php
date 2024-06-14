@@ -71,24 +71,24 @@ class CrudForm extends Component
     protected function rules(): array
     {
         return ($this->currentProfile
-                    ? new StoreProfileRequest()
-                    : new UpdateProfileRequest()
+                    ? new UpdateProfileRequest()
+                    : new StoreProfileRequest()
                 )->rules();
     }
 
     public function messages(): array
     {
         return ($this->currentProfile
-                    ? new StoreProfileRequest()
-                    : new UpdateProfileRequest()
+                    ? new UpdateProfileRequest()
+                    : new StoreProfileRequest()
                 )->messages();
     }
 
     private function authorizeFormRequest(): bool
     {
         return ($this->currentProfile
-                    ? new StoreProfileRequest()
-                    : new UpdateProfileRequest()
+                    ? new UpdateProfileRequest()
+                    : new StoreProfileRequest()
                 )->authorize();
     }
 

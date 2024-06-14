@@ -22,7 +22,7 @@
                     <x-table.row>
                         <x-table.cell>{{ $payment->id }}</x-table.cell>
                         <x-table.cell>{{ $payment->booking_id }}</x-table.cell>
-                        <x-table.cell>{{ $payment->status }}</x-table.cell>
+                        <x-table.cell>{{ $payment->status->name }}</x-table.cell>
                         <x-table.cell>{{ count($payment->response_data ?? []) }}</x-table.cell>
                         <x-table.cell>
                             <button wire:click="openPaymentEdit('{{ $payment->id }}')"
@@ -62,7 +62,7 @@
             </div>
             <div class="col-span-6 sm:col-span-4">
                 <x-label for="status" value="{{ __('Status') }}" />
-                <x-input name="status" id="status" type="number" class="mt-1 block w-full" wire:model="status" />
+                <x-select :options="App\Enums\PaymentStatus::getOptions()" name="status" id="status" type="number" class="mt-1 block w-full" wire:model="status" />
             </div>
             <div class="col-span-6 sm:col-span-4">
                 <x-label for="response_data" value="{{ __('Response Data') }}" />
