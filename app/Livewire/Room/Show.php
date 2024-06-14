@@ -4,6 +4,7 @@ namespace App\Livewire\Room;
 
 use App\Models\Room;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class Show extends Component
 {
@@ -29,6 +30,11 @@ class Show extends Component
 
     public function handleBookingDatesSelected($bookingDates)
     {
+        if (!Auth::check()) {
+            session(['url.intended' => route('room.show', $this->room->id)]);
+            return redirect()->route('login');
+        }
+
         $this->bookingDates = $bookingDates;
         $this->step = 'booking-create';
     }
