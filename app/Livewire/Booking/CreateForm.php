@@ -37,6 +37,7 @@ class CreateForm extends Component
     {
         $this->room = $room;
         $this->profiles = Auth::user()->profiles()->get();
+        $this->payment_method = 0;
 
         if ($this->profiles->isNotEmpty()) {
             $profile = $this->profiles->first();
