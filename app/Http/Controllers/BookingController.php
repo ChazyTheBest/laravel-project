@@ -9,13 +9,11 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        // Retrieve the authenticated user
         $user = $request->user();
 
         // Fetch the user's bookings with eager loading of profile and room
         $bookings = $user->bookings()->with('profile', 'room')->get();
 
-        // Pass the bookings data to the view
         return view('booking.index', compact('bookings'));
     }
 
