@@ -21,8 +21,12 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
+        $booking->load('profile', 'room');
+        $room = $booking->room;
+
         return view('booking.show', [
-            'booking' => $booking->load('profile', 'room')
+            'booking' => $booking,
+            'isAvailable' => $room->isAvailable($booking->check_in_date, $booking->check_out_date)
         ]);
     }
 }

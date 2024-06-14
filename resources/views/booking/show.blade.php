@@ -37,7 +37,11 @@
                             <p class="text-md font-medium text-gray-700 dark:text-gray-300">Total Paid: $<span>{{ $booking->room->price_per_night }}</span></p>
                         @else
                             <p class="text-md font-medium text-gray-700 dark:text-gray-300">Total Due: $<span>{{ $booking->room->price_per_night }}</span></p>
-                            <a href="{{ route('payment.mockup', [$booking->payment->id]) }}">Retry payment</a>
+                            @if ($isAvailable)
+                                <a href="{{ route('payment.mockup', [$booking->payment->id]) }}">Retry payment</a>
+                            @else
+                                <p class="text-md font-medium text-red-700 dark:text-red-300">{{ __('This room is no longer available for the chosen dates.') }}</p>
+                            @endif
                         @endif
                     </div>
                 </div>

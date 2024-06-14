@@ -48,24 +48,30 @@ class Room extends Model
     /**
      * Whether the room is available or not.
      *
-     * @param string $startDate The booking check in date.
-     * @param string $endDate The booking check out date.
+     * @param string $checkInDate The booking check in date.
+     * @param string $checkOutDate The booking check out date.
      * @return bool True if the room is available, false otherwise.
      */
-    public function isAvailable($startDate, $endDate): bool
+    public function isAvailable($checkInDate, $checkOutDate): bool
     {
-        $bookings = $this->bookings()->where('status', BookingStatus::CONFIRMED)
-                                      ->where(function ($query) use ($startDate, $endDate) {
-                                          $query->whereBetween('check_in_date', [$startDate, $endDate])
-                                                ->orWhereBetween('check_out_date', [$startDate, $endDate])
-                                                ->orWhere(function ($query) use ($startDate, $endDate) {
-                                                    $query->where('check_in_date', '<', $startDate)
-                                                          ->where('check_out_date', '>', $endDate);
-                                                });
-                                      })
-                                      ->exists();
+        $today = Carbon::today()->toDateString();
 
-        return !$bookings;
+        // Check if the booking starts after or equal to today
+        if ($checkInDate < $today || $checkOutDate < $today) {
+            return false; // Booking cannot start in the past
+        }
+
+        return !$this->bookings()->where('status', BookingStatus::CONFIRMED)
+            ->where('check_in_date', '>=', $today)
+            ->where(function($query) use ($checkInDate, $checkOutDate) {
+                $query->whereBetween('check_in_date', [$checkInDate, $checkOutDate])
+                      ->orWhereBetween('check_out_date', [$checkInDate, $checkOutDate])
+                      ->orWhere(function($query) use ($checkInDate, $checkOutDate) {
+                          $query->where('check_in_date', '<', $checkInDate)
+                                ->where('check_out_date', '>', $checkOutDate);
+                      });
+            })
+            ->exists();
     }
 
     /**
@@ -75,34 +81,42 @@ class Room extends Model
      */
     public function getUnavailableDates(): array
     {
-        // Fetch all confirmed bookings related to the instance calling the method
-        $bookings = $this->bookings()
-                        ->where('status', BookingStatus::CONFIRMED)
-                        ->where('check_out_date', '>=', Carbon::now(config('app.timezone'))->toDateString())
-                        ->get();
+        // Fetch overlapping dates directly from the database
+        $overlappingDates = DB::table('bookings')
+            ->where('room_id', $this->id)
+            ->where('status', BookingStatus::CONFIRMED)
+            ->where('check_out_date', '>=', Carbon::today()->toDateString())
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->whereBetween('check_in_date', [$checkInDate, $checkOutDate])
+                        ->orWhereBetween('check_out_date', [$checkInDate, $checkOutDate])
+                        ->orWhere(function ($query) use ($checkInDate, $checkOutDate) {
+                            $query->where('check_in_date', '<', $checkInDate)
+                                    ->where('check_out_date', '>', $checkOutDate);
+                        })
+                        ->orWhere(function ($query) use ($checkInDate, $checkOutDate) {
+                            $query->where('check_in_date', '<=', $checkInDate)
+                                    ->where('check_out_date', '>=', $checkOutDate);
+                        });
+                });
+            })
+            ->pluck('check_in_date', 'check_out_date');
 
         $unavailableDates = [];
 
-        // Iterate through each booking to check for overlaps
-        foreach ($bookings as $booking) {
-            // Get the check-in and check-out dates of the current booking
-            $checkInDate = $booking->check_in_date;
-            $checkOutDate = $booking->check_out_date;
+        // Process each overlapping date range
+        foreach ($overlappingDates as $start => $end) {
+            $currentDate = Carbon::parse($start);
+            $endDate = Carbon::parse($end);
 
-            // Iterate through the dates in the range of the current booking
-            $currentDate = Carbon::parse($checkInDate);
-            $endDate = Carbon::parse($checkOutDate);
             while ($currentDate->lte($endDate)) {
-                // Check if the current date is already marked as unavailable
-                if (!in_array($currentDate->toDateString(), $unavailableDates)) {
-                    // Mark the current date as unavailable
-                    $unavailableDates[] = $currentDate->toDateString();
-                }
+                $unavailableDates[] = $currentDate->toDateString();
+
                 // Move to the next date
                 $currentDate->addDay();
             }
         }
 
-        return $unavailableDates;
+        return array_unique($unavailableDates);
     }
 }

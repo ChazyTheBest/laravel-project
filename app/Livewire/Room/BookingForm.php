@@ -24,12 +24,10 @@ class BookingForm extends Component
 
     public function render()
     {
-        $appTimezone = Config::get('app.timezone');
-        $now = Carbon::now($appTimezone);
-        $today = $now->toDateString();
+        $today = Carbon::now()->toDateString();
 
-        $tomorrow = $now->copy()->addDay()->toDateString();
-        $dayAfterTomorrow = $now->copy()->addDays(2)->toDateString();
+        $tomorrow = $today->copy()->addDay()->toDateString();
+        $dayAfterTomorrow = $today->copy()->addDays(2)->toDateString();
 
         $request = new CheckBookingRequest;
         $rules = $request->rules();
