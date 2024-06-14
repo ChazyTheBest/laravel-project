@@ -66,6 +66,7 @@ class StoreBookingRequest extends FormRequest
             'check_in_date.required' => 'The check-in date field is required.',
             'check_in_date.date' => 'The check-in date must be a valid date.',
             'check_in_date.after' => 'The check-in date must be a future date after today.',
+            'check_in_date.after_or_equal' => 'The check-in date must be today or a future date.',
             'check_in_date.availability' => 'The selected date is not available.',
             'check_out_date.required' => 'The check-out date field is required.',
             'check_out_date.date' => 'The check-out date must be a valid date.',

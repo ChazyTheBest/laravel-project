@@ -34,4 +34,9 @@ enum BookingStatus: int {
     {
         return array_map(fn($role) => ['id' => $role->value, 'name' => $role->name], self::cases());
     }
+
+    public static function getValues(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

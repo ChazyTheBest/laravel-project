@@ -8,7 +8,7 @@ enum Role: int {
 
     public static function getValues(): array
     {
-        return array_map(fn($role) => $role->value, self::cases());
+        return array_column(self::cases(), 'value');
     }
 
     public static function getOptions(): array

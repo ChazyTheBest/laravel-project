@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\BookingStatus;
 use App\Enums\Role;
 use App\Rules\RoomAvailability;
 
@@ -46,6 +48,10 @@ class UpdateBookingRequest extends FormRequest
                 'exists:room,id',
                 new RoomAvailability,
             ],
+            'status' => [
+                'required',
+                Rule::in(BookingStatus::cases(), 'value'),
+            ],
             'check_in_date' => 'required|date|after:today',
             'check_out_date' => 'required|date|after:check_in_date',
         ] : [
@@ -61,10 +67,21 @@ class UpdateBookingRequest extends FormRequest
     public function messages()
     {
         return [
+            'profile_id.required' => 'The profile ID field is required.',
             'profile_id.exists' => 'The selected profile does not exist.',
+            'room_id.required' => 'The room ID field is required.',
             'room_id.exists' => 'The selected room does not exist.',
-            'check_in_date.after_or_equal' => 'The check-in date must be a future date after today.',
+            'status.required' => 'The status is required.',
+            'status.in' => 'The selected status is invalid.',
+            'check_in_date.required' => 'The check-in date field is required.',
+            'check_in_date.date' => 'The check-in date must be a valid date.',
+            'check_in_date.after' => 'The check-in date must be a future date after today.',
+            'check_in_date.after_or_equal' => 'The check-in date must be today or a future date.',
+            'check_in_date.availability' => 'The selected date is not available.',
+            'check_out_date.required' => 'The check-out date field is required.',
+            'check_out_date.date' => 'The check-out date must be a valid date.',
             'check_out_date.after' => 'The check-out date must be after the check-in date.',
+            'check_out_date.availability' => 'The selected date is not available.',
         ];
     }
 }

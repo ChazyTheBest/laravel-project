@@ -26,7 +26,7 @@ class CrudForm extends Component
     // Booking Fields
     public ?int $profile_id;
     public ?int $room_id;
-    public BookingStatus $status;
+    public int $status;
     public string $check_in_date;
     public string $check_out_date;
 
@@ -39,7 +39,7 @@ class CrudForm extends Component
     {
         $this->profile_id = null;
         $this->room_id = null;
-        $this->status = BookingStatus::PENDING;
+        $this->status = 0;
         $this->check_in_date = '';
         $this->check_out_date = '';
     }
@@ -88,7 +88,7 @@ class CrudForm extends Component
         if ($this->currentBooking) {
             $this->profile_id = $this->currentBooking->profile_id;
             $this->room_id = $this->currentBooking->room_id;
-            $this->status = $this->currentBooking->status;
+            $this->status = $this->currentBooking->status->value;
             $this->check_in_date = $this->currentBooking->check_in_date;
             $this->check_out_date = $this->currentBooking->check_out_date;
             $this->isBookingEditOpen = true;
