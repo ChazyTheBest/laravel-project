@@ -81,42 +81,28 @@ class Room extends Model
      */
     public function getUnavailableDates(): array
     {
-        // Fetch overlapping dates directly from the database
-        $overlappingDates = DB::table('bookings')
+        // Fetch overlapping dates directly from the database for all confirmed bookings
+        $bookings = $this->bookings()
             ->where('room_id', $this->id)
             ->where('status', BookingStatus::CONFIRMED)
             ->where('check_out_date', '>=', Carbon::today()->toDateString())
-            ->where(function ($query) {
-                $query->where(function ($query) {
-                    $query->whereBetween('check_in_date', [$checkInDate, $checkOutDate])
-                        ->orWhereBetween('check_out_date', [$checkInDate, $checkOutDate])
-                        ->orWhere(function ($query) use ($checkInDate, $checkOutDate) {
-                            $query->where('check_in_date', '<', $checkInDate)
-                                    ->where('check_out_date', '>', $checkOutDate);
-                        })
-                        ->orWhere(function ($query) use ($checkInDate, $checkOutDate) {
-                            $query->where('check_in_date', '<=', $checkInDate)
-                                    ->where('check_out_date', '>=', $checkOutDate);
-                        });
-                });
-            })
-            ->pluck('check_in_date', 'check_out_date');
+            ->get(['check_in_date', 'check_out_date']);
 
         $unavailableDates = [];
 
-        // Process each overlapping date range
-        foreach ($overlappingDates as $start => $end) {
-            $currentDate = Carbon::parse($start);
-            $endDate = Carbon::parse($end);
+        // Process each booking to collect all dates within the range
+        foreach ($bookings as $booking) {
+            $checkInDate = Carbon::parse($booking->check_in_date);
+            $checkOutDate = Carbon::parse($booking->check_out_date);
 
-            while ($currentDate->lte($endDate)) {
-                $unavailableDates[] = $currentDate->toDateString();
-
-                // Move to the next date
-                $currentDate->addDay();
+            // Generate an array of dates within the range of each booking
+            while ($checkInDate->lte($checkOutDate)) {
+                $unavailableDates[] = $checkInDate->toDateString();
+                $checkInDate->addDay();
             }
         }
 
-        return array_unique($unavailableDates);
+        // Remove duplicates and return the array of unique unavailable dates
+        return array_values(array_unique($unavailableDates));
     }
 }

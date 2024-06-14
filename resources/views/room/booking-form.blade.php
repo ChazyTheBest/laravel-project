@@ -9,12 +9,12 @@
         <div class="flex flex-col md:flex-row mt-4 justify-center">
             <div class="mb-4 md:mb-0">
                 <label for="check_in_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Check-in Date</label>
-                <input value="{{ $checkInDateMin }}" type="text" id="check_in_date" wire:model="check_in_date" class="mt-1 block w-full shadow-sm sm:text-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md flatpickr">
+                <input type="text" id="check_in_date" wire:model="check_in_date" class="mt-1 block w-full shadow-sm sm:text-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md flatpickr">
                 <x-input-error for="check_in_date" class="mt-2" />
             </div>
             <div class="ml-0 md:ml-4">
                 <label for="check_out_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Check-out Date</label>
-                <input value="{{ $checkOutDateMin }}" type="text" id="check_out_date" wire:model="check_out_date" class="mt-1 block w-full shadow-sm sm:text-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md flatpickr">
+                <input type="text" id="check_out_date" wire:model="check_out_date" class="mt-1 block w-full shadow-sm sm:text-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md flatpickr">
                 <x-input-error for="check_out_date" class="mt-2" />
             </div>
         </div>
