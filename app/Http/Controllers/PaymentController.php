@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Enums\PaymentStatus;
 use App\Enums\BookingStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -17,7 +18,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function callback(Request $request, Payment $payment)
+    public function callback(Request $request, Payment $payment): JsonResponse
     {
         $jsonResponse = $request->json()->all();
 

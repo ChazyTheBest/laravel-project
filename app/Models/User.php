@@ -23,7 +23,7 @@ class User extends Authenticatable// implements MustVerifyEmail
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    //use SoftDeletes;
+    use SoftDeletes;
 
     /**
      * The table associated with the model.
