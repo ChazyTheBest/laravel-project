@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\RoomController;
 use App\Livewire\Room\Show;
 use App\Models\Booking;
 use App\Models\Payment;
@@ -11,13 +10,18 @@ use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => view('dashboard'))->name('dashboard');
+Route::get('/', fn () => view('dashboard'))
+    ->name('dashboard');
 
-Route::get('/rooms', [RoomController::class, 'index'])->name('room.index');
-Route::get('/room/{room}', Show::class)->name('room.show');
+Route::get('/rooms', fn () => view('room.index', ['rooms' => Room::all()]))
+    ->name('room.index');
+Route::get('/room/{room}', Show::class)
+    ->name('room.show');
 
-Route::get('/booking/confirmed', fn () => view('booking.confirmed'))->name('booking.confirmed');
-Route::get('/booking/failed', fn () => view('booking.failed'))->name('booking.failed');
+Route::get('/booking/confirmed', fn () => view('booking.confirmed'))
+    ->name('booking.confirmed');
+Route::get('/booking/failed', fn () => view('booking.failed'))
+    ->name('booking.failed');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/bookings', fn () => view('livewire.admin-booking'))
