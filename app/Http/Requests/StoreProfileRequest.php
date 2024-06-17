@@ -38,7 +38,7 @@ class StoreProfileRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'The name field is required.',

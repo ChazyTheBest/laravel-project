@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Role;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRoomRequest extends FormRequest
 {
@@ -33,12 +35,20 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required|numeric|unique:room,number',
+            'number' => [
+                'required',
+                'numeric',
+                Rule::unique('room', 'number'),
+            ],
             'capacity' => 'required|integer|min:1',
             'beds' => 'required|integer|min:1',
-            'name' => 'required|string|unique:room,name',
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('room', 'name'),
+            ],
             'description' => 'required|string',
-            'price_per_night' => 'required|numeric|min:0',
+            'price_per_night' => 'required|numeric|min:1',
         ];
     }
 
@@ -47,7 +57,7 @@ class StoreRoomRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'number.required' => 'The room number is required.',

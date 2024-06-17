@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Enums\Role;
-use App\Rules\RoomAvailability;
 
 class CheckPaymentMethodRequest extends FormRequest
 {

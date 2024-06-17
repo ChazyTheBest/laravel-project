@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Room;
 
-use App\Models\Room;
 use App\Http\Requests\CheckBookingRequest;
+use App\Models\Room;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class BookingForm extends Component
@@ -23,6 +23,31 @@ class BookingForm extends Component
     }
 
     public function render()
+    {
+        $bookingMinDates = $this->getBookingMinDates();
+
+        return view('room.booking-form', [
+            'room' => $this->room,
+            'checkInDateMin' => $bookingMinDates[0],
+            'checkOutDateMin' => $bookingMinDates[1],
+        ]);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function submitForm(): void
+    {
+        $this->validateCheckBookingRequest();
+
+        // Emit event with booking dates
+        $this->dispatch('bookingDatesSelected', [
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date
+        ]);
+    }
+
+    private function getBookingMinDates(): array
     {
         $now = Carbon::now();
         $today = $now->toDateString();
@@ -42,29 +67,22 @@ class BookingForm extends Component
             $checkInDateMin = $tomorrow;
         }
 
-        return view('room.booking-form', [
-            'room' => $this->room,
-            'checkInDateMin' => $checkInDateMin,
-            'checkOutDateMin' => $checkOutDateMin,
-        ]);
+        return [$checkInDateMin, $checkOutDateMin];
     }
 
-    public function submitForm()
+    /**
+     * @throws ValidationException
+     */
+    private function validateCheckBookingRequest(): void
     {
-        $request = new CheckBookingRequest;
+        $request = new CheckBookingRequest();
 
         $data = [
             'room_id' => $this->room->id,
             'check_in_date' => $this->check_in_date,
-            'check_out_date' => $this->check_out_date
+            'check_out_date' => $this->check_out_date,
         ];
 
         Validator::make($data, $request->rules(), $request->messages())->validate();
-
-        // Emit event with booking dates
-        $this->dispatch('bookingDatesSelected', [
-            'check_in_date' => $this->check_in_date,
-            'check_out_date' => $this->check_out_date
-        ]);
     }
 }

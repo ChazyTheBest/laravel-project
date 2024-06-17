@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Enums\Role;
 
 class UpdateRoomRequest extends FormRequest
 {
@@ -31,23 +32,23 @@ class UpdateRoomRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules($room_id = null): array
+    public function rules(): array
     {
         return [
             'number' => [
                 'required',
                 'numeric',
-                Rule::unique('room', 'number')->ignore($room_id ?? $this->input('room_id')),
+                Rule::unique('room', 'number')->ignore($this->input('id')),
             ],
             'capacity' => 'required|integer|min:1',
             'beds' => 'required|integer|min:1',
             'name' => [
                 'required',
                 'string',
-                Rule::unique('room', 'name')->ignore($room_id ?? $this->input('room_id')),
+                Rule::unique('room', 'name')->ignore($this->input('id')),
             ],
             'description' => 'required|string',
-            'price_per_night' => 'required|numeric|min:0',
+            'price_per_night' => 'required|numeric|min:1',
         ];
     }
 
@@ -56,7 +57,7 @@ class UpdateRoomRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'number.required' => 'The room number is required.',

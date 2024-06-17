@@ -1,4 +1,13 @@
-@props(['id' => null, 'maxWidth' => null])
+@props([
+    'id' => null,
+    'maxWidth' => null,
+    'title' => '',
+    'content' => '',
+    'cancel' => '',
+    'save' => '',
+    'btn' => '',
+    'footer' => ''
+    ])
 
 <x-modal :id="$id" :maxWidth="$maxWidth" {{ $attributes }}>
     <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -22,6 +31,16 @@
     </div>
 
     <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 dark:bg-gray-800 text-end">
-        {{ $footer }}
+        @if ($footer)
+            {{ $footer }}
+        @else
+            <x-secondary-button wire:click.prevent="{{ $cancel }}">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-danger-button class="ms-3" wire:click.prevent="{{ $save }}" wire:loading.attr="disabled">
+                {{ $btn }}
+            </x-danger-button>
+        @endif
     </div>
 </x-modal>

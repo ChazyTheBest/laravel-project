@@ -2,9 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use App\Enums\Role;
 use App\Rules\RoomAvailability;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CheckBookingRequest extends FormRequest
 {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Role;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProfileRequest extends FormRequest
@@ -11,7 +12,13 @@ class UpdateProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        // Ensure id is present in the request
+        $this->validate(['id' => 'required']);
+
+        $user = request()->user();
+
+        // Check if the user is staff or owns the profile
+        return $user->hasRole(Role::STAFF) || $user->ownsProfile($this->input('id'));
     }
 
     /**
@@ -24,7 +31,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'phone_2' => 'optional|string|max:20',
+            'phone_2' => 'string|max:20',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'state' => 'required|string|max:255',
@@ -38,7 +45,7 @@ class UpdateProfileRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'The name field is required.',

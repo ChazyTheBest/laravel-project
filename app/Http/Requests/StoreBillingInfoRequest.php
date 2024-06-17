@@ -35,7 +35,7 @@ class StoreBillingInfoRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'address.required' => 'The address field is required.',

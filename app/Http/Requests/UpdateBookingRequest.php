@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use App\Enums\BookingStatus;
 use App\Enums\Role;
 use App\Rules\RoomAvailability;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBookingRequest extends FormRequest
 {
@@ -64,7 +65,7 @@ class UpdateBookingRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'profile_id.required' => 'The profile ID field is required.',

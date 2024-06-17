@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use App\Enums\Role;
 use App\Rules\RoomAvailability;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBookingRequest extends FormRequest
 {
@@ -16,10 +16,8 @@ class StoreBookingRequest extends FormRequest
         // Ensure profile_id is present in the request
         $this->validate(['profile_id' => 'required']);
 
-        $user = request()->user();
-
         // Check if the user is staff or owns the profile
-        return $user->hasRole(Role::STAFF) || $user->ownsProfile($this->input('profile_id'));
+        return request()->user()->ownsProfile($this->input('profile_id'));
     }
 
     /**

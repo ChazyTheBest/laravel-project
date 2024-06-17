@@ -12,7 +12,7 @@ use Carbon\Carbon;
 class Room extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+    //use SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -52,7 +52,7 @@ class Room extends Model
      * @param string $checkOutDate The booking check out date.
      * @return bool True if the room is available, false otherwise.
      */
-    public function isAvailable($checkInDate, $checkOutDate): bool
+    public function isAvailable(string $checkInDate, string $checkOutDate): bool
     {
         $today = Carbon::today()->toDateString();
 

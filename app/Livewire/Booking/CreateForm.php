@@ -2,14 +2,20 @@
 
 namespace App\Livewire\Booking;
 
+use App\Http\Requests\CheckBookingRequest;
 use App\Http\Requests\CheckPaymentMethodRequest;
 use App\Http\Requests\StoreBillingInfoRequest;
 use App\Http\Requests\StoreBookingRequest;
+use App\Models\BillingInfo;
+use App\Models\Booking;
+use App\Models\Payment;
 use App\Models\Profile;
 use App\Models\Room;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class CreateForm extends Component
@@ -33,10 +39,18 @@ class CreateForm extends Component
     public string $postal_code;
     public string $country;
 
-    public function mount(Room $room, array $bookingDates)
+    /**
+     * @throws ValidationException
+     */
+    public function mount(Room $room, array $bookingDates): void
     {
         $this->room = $room;
         $this->profiles = Auth::user()->profiles()->get();
+
+        $this->room_id = $room->id;
+        $this->check_in_date = $bookingDates['check_in_date'];
+        $this->check_out_date = $bookingDates['check_out_date'];
+
         $this->payment_method = 0;
 
         if ($this->profiles->isNotEmpty()) {
@@ -49,10 +63,7 @@ class CreateForm extends Component
             $this->country = $profile->country;
         }
 
-        // hidden input elements for re-validation
-        $this->room_id = $room->id;
-        $this->check_in_date = $bookingDates['check_in_date'];
-        $this->check_out_date = $bookingDates['check_out_date'];
+        $this->validateCheckBookingRequest();
     }
 
     public function render()
@@ -65,6 +76,46 @@ class CreateForm extends Component
         ]);
     }
 
+    /**
+     * @throws AuthorizationException|ValidationException
+     */
+    public function book(): void
+    {
+        $this->authorizeActions();
+
+        $this->validateAndAuthorizeFormRequests();
+
+        // Rollback on insert error
+        DB::transaction(function () {
+            // Step 1: Create booking
+            $booking = Profile::find($this->profile_id)->bookings()->create([
+                'room_id' => $this->room->id,
+                'check_in_date' => $this->check_in_date,
+                'check_out_date' => $this->check_out_date,
+            ]);
+
+            // Step 2: Create payment
+            $payment = $booking->payment()->create();
+
+            // Step 3: Create billing info
+            $billing_info = $payment->billingInfo()->create([
+                'address' => $this->address,
+                'city' => $this->city,
+                'state' => $this->state,
+                'postal_code' => $this->postal_code,
+                'country' => $this->country,
+                'payment_id' => $payment->id,
+            ]);
+
+            return redirect()->route('payment.mockup', [
+                'payment' => $payment
+            ]);
+        });
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
     private function authorizeActions(): void
     {
         $this->authorize('create', Booking::class);
@@ -72,6 +123,26 @@ class CreateForm extends Component
         $this->authorize('create', BillingInfo::class);
     }
 
+    /**
+     * @throws ValidationException
+     */
+    private function validateCheckBookingRequest(): void
+    {
+        $checkBookingRequest = new CheckBookingRequest();
+
+        $data = [
+            'room_id' => $this->room_id,
+            'check_in_date' => $this->check_in_date,
+            'check_out_date' => $this->check_out_date,
+        ];
+
+        Validator::make($data, $checkBookingRequest->rules(), $checkBookingRequest->messages())->validate();
+    }
+
+    /**
+     * @throws AuthorizationException
+     * @throws ValidationException
+     */
     private function validateAndAuthorizeFormRequests(): void
     {
         $storeBookingRequest = new StoreBookingRequest();
@@ -128,39 +199,5 @@ class CreateForm extends Component
         if (!$storeBillingInfoRequest->authorize()) {
             $storeBillingInfoRequest->failedAuthorization();
         }
-    }
-
-    public function book()
-    {
-        $this->authorizeActions();
-
-        $this->validateAndAuthorizeFormRequests();
-
-        // Rollback on insert error
-        DB::transaction(function () {
-            // Step 1: Create booking
-            $booking = Profile::find($this->profile_id)->bookings()->create([
-                'room_id' => $this->room->id,
-                'check_in_date' => $this->check_in_date,
-                'check_out_date' => $this->check_out_date,
-            ]);
-
-            // Step 2: Create payment
-            $payment = $booking->payment()->create();
-
-            // Step 3: Create billing info
-            $billing_info = $payment->billingInfo()->create([
-                'address' => $this->address,
-                'city' => $this->city,
-                'state' => $this->state,
-                'postal_code' => $this->postal_code,
-                'country' => $this->country,
-                'payment_id' => $payment->id,
-            ]);
-
-            return redirect()->route('payment.mockup', [
-                'payment' => $payment
-            ]);
-        });
     }
 }
